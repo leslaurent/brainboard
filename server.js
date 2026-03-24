@@ -242,7 +242,6 @@ Rules:
 });
 
 // ── DIAGNOSTIC ──
-const fs = require('fs');
 const publicPath = path.join(__dirname, 'public');
 console.log('__dirname:', __dirname);
 console.log('public path:', publicPath);
