@@ -1,6 +1,7 @@
 const express = require('express');
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,7 +13,6 @@ if (!ANTHROPIC_API_KEY) {
   process.exit(1);
 }
 
-// ── DATABASE SETUP ──
 const db = new Database('brainboard.db');
 db.exec(`
   CREATE TABLE IF NOT EXISTS notes (
@@ -41,20 +41,23 @@ db.exec(`
   );
 `);
 
-// Ensure revealed setting exists
 const revealedRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('revealed');
 if (!revealedRow) {
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('revealed', 'false');
 }
 
-// ── MIDDLEWARE ──
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+
+const publicPath = path.join(__dirname, 'public');
+console.log('__dirname:', __dirname);
+console.log('public exists:', fs.existsSync(publicPath));
+console.log('public contents:', fs.existsSync(publicPath) ? fs.readdirSync(publicPath) : 'MISSING');
+
+app.use(express.static(publicPath));
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-// ── AUTH CHECK ──
 function requireFacilitator(req, res, next) {
   const auth = req.headers['x-facilitator-password'];
   if (auth !== FACILITATOR_PASSWORD) {
@@ -63,12 +66,8 @@ function requireFacilitator(req, res, next) {
   next();
 }
 
-// ── ROUTES ──
-
-// Health check
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
-// Get facilitator password (just confirms it matches — never sends it back)
 app.post('/api/auth', (req, res) => {
   const { password } = req.body;
   if (password === FACILITATOR_PASSWORD) {
@@ -78,15 +77,11 @@ app.post('/api/auth', (req, res) => {
   }
 });
 
-// ── NOTES ──
-
-// Get all notes
 app.get('/api/notes', (req, res) => {
   const notes = db.prepare('SELECT * FROM notes ORDER BY created_at ASC').all();
   res.json(notes);
 });
 
-// Add a note
 app.post('/api/notes', (req, res) => {
   const { id, text, author, color, rot } = req.body;
   if (!id || !text) return res.status(400).json({ error: 'id and text required' });
@@ -95,14 +90,12 @@ app.post('/api/notes', (req, res) => {
   res.json({ ok: true });
 });
 
-// Delete a note (facilitator only)
 app.delete('/api/notes/:id', requireFacilitator, (req, res) => {
   db.prepare('DELETE FROM notes WHERE id = ?').run(req.params.id);
   db.prepare('DELETE FROM group_notes WHERE note_id = ?').run(req.params.id);
   res.json({ ok: true });
 });
 
-// Delete all notes (facilitator only)
 app.delete('/api/notes', requireFacilitator, (req, res) => {
   db.prepare('DELETE FROM notes').run();
   db.prepare('DELETE FROM group_notes').run();
@@ -110,7 +103,6 @@ app.delete('/api/notes', requireFacilitator, (req, res) => {
   res.json({ ok: true });
 });
 
-// Update note text (facilitator only)
 app.patch('/api/notes/:id', requireFacilitator, (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'text required' });
@@ -118,9 +110,6 @@ app.patch('/api/notes/:id', requireFacilitator, (req, res) => {
   res.json({ ok: true });
 });
 
-// ── GROUPS ──
-
-// Get all groups with their note IDs
 app.get('/api/groups', (req, res) => {
   const groups = db.prepare('SELECT * FROM groups ORDER BY position ASC').all();
   const groupsWithNotes = groups.map(g => ({
@@ -132,30 +121,23 @@ app.get('/api/groups', (req, res) => {
   res.json(groupsWithNotes);
 });
 
-// Save all groups (replaces existing)
 app.post('/api/groups', requireFacilitator, (req, res) => {
   const { groups } = req.body;
   if (!Array.isArray(groups)) return res.status(400).json({ error: 'groups array required' });
-
   db.prepare('DELETE FROM groups').run();
   db.prepare('DELETE FROM group_notes').run();
-
   const insertGroup = db.prepare('INSERT INTO groups (id, name, color, position) VALUES (?, ?, ?, ?)');
   const insertNote = db.prepare('INSERT INTO group_notes (group_id, note_id, position) VALUES (?, ?, ?)');
-
   const saveAll = db.transaction(() => {
     groups.forEach((g, i) => {
       insertGroup.run(g.id, g.name, g.color, i);
-      (g.noteIds || []).forEach((nid, j) => {
-        insertNote.run(g.id, nid, j);
-      });
+      (g.noteIds || []).forEach((nid, j) => { insertNote.run(g.id, nid, j); });
     });
   });
   saveAll();
   res.json({ ok: true });
 });
 
-// Rename a group (facilitator only)
 app.patch('/api/groups/:id', requireFacilitator, (req, res) => {
   const { name } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
@@ -163,14 +145,11 @@ app.patch('/api/groups/:id', requireFacilitator, (req, res) => {
   res.json({ ok: true });
 });
 
-// Delete a group (facilitator only)
 app.delete('/api/groups/:id', requireFacilitator, (req, res) => {
   db.prepare('DELETE FROM groups WHERE id = ?').run(req.params.id);
   db.prepare('DELETE FROM group_notes WHERE group_id = ?').run(req.params.id);
   res.json({ ok: true });
 });
-
-// ── SETTINGS ──
 
 app.get('/api/settings', (req, res) => {
   const rows = db.prepare('SELECT key, value FROM settings').all();
@@ -186,15 +165,12 @@ app.patch('/api/settings', requireFacilitator, (req, res) => {
   res.json({ ok: true });
 });
 
-// ── AI GROUPING ──
 app.post('/api/ai/group', requireFacilitator, async (req, res) => {
   const { context } = req.body;
   const notes = db.prepare('SELECT * FROM notes ORDER BY created_at ASC').all();
-
   if (notes.length < 2) {
     return res.status(400).json({ error: 'Need at least 2 notes to group.' });
   }
-
   const notesList = notes.map(n => `- [${n.id}] ${n.text}`).join('\n');
   const prompt = `You are helping a cross-functional project team organize brainstormed tasks into logical work areas.
 ${context ? '\nProject context: ' + context : ''}
@@ -202,13 +178,13 @@ ${context ? '\nProject context: ' + context : ''}
 Here are the tasks submitted by the team (each has an ID in brackets):
 ${notesList}
 
-Group these tasks into 4–8 logical work areas / workstreams.
+Group these tasks into 4-8 logical work areas / workstreams.
 Return ONLY valid JSON — no explanation, no markdown fences, nothing else:
-{"groups":[{"name":"Short Group Name","noteIds":["id1","id2"]},…]}
+{"groups":[{"name":"Short Group Name","noteIds":["id1","id2"]}]}
 
 Rules:
 - Every task ID must appear in exactly one group — no omissions
-- Group names should be short, action-oriented (2–4 words), relevant to the project context if given
+- Group names should be short, action-oriented (2-4 words), relevant to the project context if given
 - If tasks are very similar or identical, place them in the same group`;
 
   try {
@@ -225,36 +201,18 @@ Rules:
         messages: [{ role: 'user', content: prompt }]
       })
     });
-
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-
     const raw = data.content?.find(b => b.type === 'text')?.text || '';
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('No JSON in AI response');
-
-    const parsed = JSON.parse(match[0]);
-    res.json(parsed);
+    res.json(JSON.parse(match[0]));
   } catch (err) {
     console.error('AI grouping error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ── DIAGNOSTIC ──
-const publicPath = path.join(__dirname, 'public');
-console.log('__dirname:', __dirname);
-console.log('public path:', publicPath);
-console.log('public exists:', fs.existsSync(publicPath));
-console.log('public contents:', fs.existsSync(publicPath) ? fs.readdirSync(publicPath) : 'N/A');
-
-const fs = require('fs');
-const publicPath = path.join(__dirname, 'public');
-console.log('__dirname:', __dirname);
-console.log('public exists:', fs.existsSync(publicPath));
-console.log('contents:', fs.existsSync(publicPath) ? fs.readdirSync(publicPath) : 'MISSING');
-
 app.listen(PORT, () => {
   console.log(`BrainBoard server running on port ${PORT}`);
 });
-
