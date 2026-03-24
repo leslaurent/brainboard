@@ -58,6 +58,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .btn-warn:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
 .btn-green{background:#16a34a;color:#fff;}
 .btn-green:hover{background:#15803d;transform:translateY(-1px);}
+.btn-green:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
 .btn-sm{padding:5px 11px;font-size:0.75rem;}
 
 .status-msg{text-align:center;margin-top:16px;font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--ink-muted);}
@@ -84,8 +85,7 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .wall-note{width:130px;min-height:120px;border-radius:2px;background:var(--note-yellow);padding:12px 10px 8px;box-shadow:3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);position:relative;transform:rotate(var(--rot));transition:transform 0.2s,box-shadow 0.2s;}
 .wall-note:hover{transform:rotate(0deg) scale(1.05);box-shadow:4px 4px 0 var(--cork-dark),6px 6px 16px var(--shadow);z-index:5;}
 .wall-note.is-dup{box-shadow:0 0 0 3px var(--dup-highlight),3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);}
-.wall-note .ntext{font-family:'Kalam',cursive;font-size:0.85rem;font-weight:400;line-height:1.55;word-break:break-word;color:var(--ink);outline:none;cursor:text;}
-.wall-note .ntext:hover{border-bottom:1.5px dashed rgba(0,0,0,0.2);}
+.wall-note .ntext{font-family:'Kalam',cursive;font-size:0.85rem;font-weight:400;line-height:1.55;word-break:break-word;color:var(--ink);}
 .wall-note .nauthor{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--ink-muted);margin-top:8px;text-align:right;}
 .wall-note .ndel{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;border:none;background:rgba(0,0,0,0.12);color:var(--ink);font-size:0.68rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;}
 .wall-note:hover .ndel{opacity:1;}
@@ -105,7 +105,8 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .merge-editor{margin-top:12px;background:var(--note-yellow);border-radius:4px;padding:12px 14px;border:2px dashed var(--cork);}
 .merge-editor label{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--ink-muted);display:block;margin-bottom:6px;}
 .merge-editor textarea{width:100%;font-family:'Kalam',cursive;font-size:0.95rem;font-weight:400;background:transparent;border:none;border-bottom:2px dashed rgba(0,0,0,0.15);outline:none;resize:vertical;color:var(--ink);line-height:1.6;min-height:50px;padding-bottom:4px;}
-.merge-editor-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.merge-editor-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center;}
+.merge-ai-loading{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--accent);animation:pulse 1s infinite;}
 
 /* ── AI PANEL ── */
 .ai-panel{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:18px 20px;margin-bottom:20px;box-shadow:0 2px 8px var(--shadow);}
@@ -115,7 +116,7 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .ai-loading{font-family:'Space Mono',monospace;font-size:0.73rem;color:var(--accent);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
 
-/* ── CONTEXT MODAL (for re-run AI) ── */
+/* ── CONTEXT MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(26,20,16,0.65);display:flex;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(3px);}
 .modal-card{background:var(--panel);border:1.5px solid var(--cork);border-radius:8px;padding:28px 30px;max-width:480px;width:90%;box-shadow:0 8px 32px var(--shadow);}
 .modal-card h3{font-family:'Space Mono',monospace;font-size:0.82rem;letter-spacing:1px;color:var(--ink-muted);margin-bottom:10px;}
@@ -131,14 +132,22 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .group-name-input{font-family:'Kalam',cursive;font-size:1rem;font-weight:700;color:var(--ink);background:transparent;border:none;border-bottom:2px dashed var(--cork);outline:none;width:100%;padding:2px 4px;cursor:text;}
 .group-del{background:none;border:none;cursor:pointer;color:#ef4444;font-size:0.85rem;flex-shrink:0;padding:2px;}
 .group-notes{display:flex;flex-direction:column;gap:8px;min-height:60px;}
-.board-note{border-radius:2px;background:var(--note-yellow);padding:10px 9px 7px;box-shadow:2px 2px 0 var(--cork-dark),3px 3px 8px var(--shadow);cursor:grab;position:relative;transform:rotate(var(--rot));transition:transform 0.15s;}
+
+/* Board notes — not contenteditable by default, edit mode toggled explicitly */
+.board-note{border-radius:2px;background:var(--note-yellow);padding:10px 9px 7px;box-shadow:2px 2px 0 var(--cork-dark),3px 3px 8px var(--shadow);cursor:grab;position:relative;transform:rotate(var(--rot));transition:transform 0.15s,box-shadow 0.15s;}
 .board-note:hover{transform:rotate(0deg) scale(1.03);z-index:5;}
 .board-note.dragging{opacity:0.35;}
-.bn-text{font-family:'Kalam',cursive;font-size:0.85rem;font-weight:400;line-height:1.55;word-break:break-word;outline:none;min-height:18px;color:var(--ink);}
-.bn-actions{display:flex;gap:4px;margin-top:6px;opacity:0;transition:opacity 0.15s;}
+.board-note.editing{cursor:default;transform:rotate(0deg) scale(1.04);z-index:10;box-shadow:0 0 0 2px var(--accent),3px 3px 10px var(--shadow);}
+.bn-text{font-family:'Kalam',cursive;font-size:0.85rem;font-weight:400;line-height:1.55;word-break:break-word;min-height:18px;color:var(--ink);}
+.board-note.editing .bn-text{outline:none;border-bottom:2px dashed rgba(0,0,0,0.2);padding-bottom:3px;cursor:text;}
+.bn-actions{display:flex;gap:4px;margin-top:6px;opacity:0;transition:opacity 0.15s;flex-wrap:wrap;}
 .board-note:hover .bn-actions{opacity:1;}
+.board-note.editing .bn-actions{opacity:1;}
 .bn-btn{font-size:0.6rem;padding:2px 7px;border-radius:3px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;}
 .bn-del{background:rgba(239,68,68,0.15);color:#ef4444;}
+.bn-edit{background:rgba(0,0,0,0.1);color:var(--ink);}
+.bn-save{background:#16a34a;color:#fff;}
+.bn-cancel{background:rgba(0,0,0,0.08);color:var(--ink-muted);}
 
 .add-group-btn{background:transparent;border:2px dashed var(--cork);border-radius:7px;padding:16px 20px;cursor:pointer;font-family:'Kalam',cursive;font-size:0.95rem;font-weight:400;color:var(--ink-muted);min-width:160px;flex:0 0 auto;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
 .add-group-btn:hover{background:rgba(200,169,110,0.12);border-color:var(--cork-dark);}
@@ -178,7 +187,7 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
   </div>
 </div>
 
-<!-- CONTEXT MODAL (Re-run AI) -->
+<!-- CONTEXT MODAL -->
 <div class="modal-overlay" id="contextModal" style="display:none;">
   <div class="modal-card">
     <h3>✦ AI GROUPING — EDIT CONTEXT</h3>
@@ -266,7 +275,7 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
     <div id="groupedPhase" style="display:none;">
       <div class="phase-label">Phase 2 — Review &amp; Organize</div>
       <div class="toolbar">
-        <h2>Drag notes · Edit group names · Add / remove</h2>
+        <h2>Drag notes · Edit notes · Rename groups</h2>
         <button class="btn btn-ghost btn-sm" onclick="backToRaw()">← Back to notes</button>
         <button class="btn btn-accent btn-sm" onclick="openContextModal()">✦ Re-run AI</button>
       </div>
@@ -297,7 +306,6 @@ let currentDupGroups = [];
 
 const ROTS = [-3,-2.5,-2,-1.5,-1,0,1,1.5,2,2.5,3];
 const rnd = a => a[Math.floor(Math.random()*a.length)];
-// Single color for all notes
 const NOTE_COLOR = 'nc0';
 let clientNextId = Date.now();
 const uid = () => String(clientNextId++);
@@ -439,7 +447,6 @@ function closeContextModal() {
 }
 async function confirmRunAI() {
   const context = document.getElementById('modalContext').value.trim();
-  // Sync back to the main context field
   document.getElementById('projectContext').value = context;
   closeContextModal();
   await runAI(context);
@@ -459,10 +466,13 @@ async function findDuplicates() {
       alert('No duplicates found — all notes look distinct.');
       return;
     }
-    currentDupGroups = result.duplicateGroups;
-    result.duplicateGroups.forEach(g => g.ids.forEach(id => dupHighlightIds.add(id)));
+    // Assign stable gid to each group so splicing never breaks onclick references
+    currentDupGroups = result.duplicateGroups.map((g, i) => ({
+      ...g, gid: 'dg' + Date.now() + '_' + i
+    }));
+    currentDupGroups.forEach(g => g.ids.forEach(id => dupHighlightIds.add(id)));
     renderFacilitatorRaw();
-    renderDupSection(result.duplicateGroups);
+    renderDupSection(currentDupGroups);
   } catch(err) {
     alert('Duplicate detection failed: ' + err.message);
   } finally {
@@ -470,91 +480,78 @@ async function findDuplicates() {
   }
 }
 
+function getGroupByGid(gid) { return currentDupGroups.find(g => g.gid === gid); }
+function removeGroupByGid(gid) { currentDupGroups = currentDupGroups.filter(g => g.gid !== gid); }
+
 function renderDupSection(dupGroups) {
-  const section = document.getElementById('dupSection');
-  const container = document.getElementById('dupGroups');
-  section.style.display = 'block';
-  container.innerHTML = dupGroups.map((g, gi) => {
+  document.getElementById('dupSection').style.display = 'block';
+  document.getElementById('dupGroups').innerHTML = dupGroups.map(g => {
+    const gid = g.gid;
     const notePreviews = g.ids.map(id => {
       const n = allNotes.find(n => n.id === id);
       if (!n) return '';
-      return `<div class="dup-note-preview">
-        ${esc(n.text)}
-        <div class="dup-note-author">${esc(n.author)}</div>
-      </div>`;
+      return `<div class="dup-note-preview">${esc(n.text)}<div class="dup-note-author">${esc(n.author)}</div></div>`;
     }).join('');
-
     const deleteButtons = g.ids.map(id => {
       const n = allNotes.find(n => n.id === id);
       if (!n) return '';
-      return `<button class="btn btn-ghost btn-sm" onclick="deleteDupNote('${id}',${gi})">
-        Delete "${esc(n.text.substring(0,25))}${n.text.length>25?'…':''}"
-      </button>`;
+      return `<button class="btn btn-ghost btn-sm" onclick="deleteDupNote('${id}','${gid}')">Delete "${esc(n.text.substring(0,25))}${n.text.length>25?'…':''}"</button>`;
     }).join('');
-
-    const mergedProposal = g.ids.map(id => {
-      const n = allNotes.find(n => n.id === id);
-      return n ? n.text : '';
-    }).filter(Boolean).join(' / ');
-
-    return `<div class="dup-group" id="dupGroup${gi}">
+    return `<div class="dup-group" id="dupGroup${gid}">
       <div class="dup-reason">💬 ${esc(g.reason)}</div>
       <div class="dup-notes">${notePreviews}</div>
       <div class="dup-actions">
         ${deleteButtons}
-        <button class="btn btn-green btn-sm" onclick="showMergeEditor(${gi})">⇋ Merge into one</button>
-        <button class="btn btn-ghost btn-sm" onclick="dismissDupGroup(${gi})">Keep all</button>
+        <button class="btn btn-green btn-sm" onclick="showMergeEditor('${gid}')">⇋ Merge into one</button>
+        <button class="btn btn-ghost btn-sm" onclick="dismissDupGroup('${gid}')">Keep all</button>
       </div>
-      <div class="merge-editor" id="mergeEditor${gi}" style="display:none;">
-        <label id="mergeLabel${gi}">Edit merged note text — then confirm:</label>
-        <textarea id="mergeText${gi}" rows="2" placeholder="AI is writing a merged version…"></textarea>
+      <div class="merge-editor" id="mergeEditor${gid}" style="display:none;">
+        <label id="mergeLabel${gid}">Edit merged note — then confirm:</label>
+        <textarea id="mergeText${gid}" rows="2" placeholder="Type here or click 'Get AI suggestion'…"></textarea>
         <div class="merge-editor-actions">
-          <button class="btn btn-green btn-sm" onclick="confirmMerge(${gi})">✓ Confirm merge</button>
-          <button class="btn btn-ghost btn-sm" onclick="hideMergeEditor(${gi})">Cancel</button>
+          <button class="btn btn-accent btn-sm" onclick="aiSuggestMerge('${gid}')">✦ Get AI suggestion</button>
+          <span class="merge-ai-loading" id="mergeLoading${gid}" style="display:none;">Thinking…</span>
+          <button class="btn btn-green btn-sm" onclick="confirmMerge('${gid}')">✓ Confirm merge</button>
+          <button class="btn btn-ghost btn-sm" onclick="hideMergeEditor('${gid}')">Cancel</button>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-async function showMergeEditor(gi) {
-  const g = currentDupGroups[gi];
+function showMergeEditor(gid) {
+  document.getElementById('mergeEditor' + gid).style.display = 'block';
+  document.getElementById('mergeText' + gid).focus();
+}
+function hideMergeEditor(gid) {
+  document.getElementById('mergeEditor' + gid).style.display = 'none';
+}
+
+async function aiSuggestMerge(gid) {
+  const g = getGroupByGid(gid);
   if (!g) return;
-  const editor = document.getElementById('mergeEditor' + gi);
-  const textarea = document.getElementById('mergeText' + gi);
-  const label = document.getElementById('mergeLabel' + gi);
-  editor.style.display = 'block';
-  textarea.value = '';
+  const loadingEl = document.getElementById('mergeLoading' + gid);
+  const textarea = document.getElementById('mergeText' + gid);
+  loadingEl.style.display = 'inline';
   textarea.disabled = true;
-  label.textContent = '✦ AI is writing a merged version…';
-
-  const texts = g.ids.map(id => {
-    const n = allNotes.find(n => n.id === id);
-    return n ? n.text : '';
-  }).filter(Boolean);
-
+  const texts = g.ids.map(id => { const n = allNotes.find(n=>n.id===id); return n?n.text:''; }).filter(Boolean);
   try {
-    const result = await apiFetch('/api/ai/merge', {
-      method: 'POST',
-      body: JSON.stringify({ texts })
-    });
+    const result = await apiFetch('/api/ai/merge', { method: 'POST', body: JSON.stringify({ texts }) });
     textarea.value = result.merged;
   } catch(err) {
+    alert('AI suggestion failed: ' + err.message);
     textarea.value = texts.join(' / ');
   } finally {
+    loadingEl.style.display = 'none';
     textarea.disabled = false;
-    label.textContent = 'Edit merged note text — then confirm:';
     textarea.focus();
   }
 }
-function hideMergeEditor(gi) {
-  document.getElementById('mergeEditor' + gi).style.display = 'none';
-}
 
-async function confirmMerge(gi) {
-  const g = currentDupGroups[gi];
+async function confirmMerge(gid) {
+  const g = getGroupByGid(gid);
   if (!g) return;
-  const mergedText = document.getElementById('mergeText' + gi).value.trim();
+  const mergedText = document.getElementById('mergeText' + gid).value.trim();
   if (!mergedText) { alert('Merged note cannot be empty.'); return; }
   const [keepId, ...deleteIds] = g.ids;
   const keepNote = allNotes.find(n => n.id === keepId);
@@ -569,8 +566,8 @@ async function confirmMerge(gi) {
       dupHighlightIds.delete(id);
     }
     dupHighlightIds.delete(keepId);
-    currentDupGroups.splice(gi, 1);
-    document.getElementById('dupGroup' + gi).remove();
+    removeGroupByGid(gid);
+    document.getElementById('dupGroup' + gid).remove();
     if (!document.getElementById('dupGroups').children.length) {
       document.getElementById('dupSection').style.display = 'none';
       dupHighlightIds.clear();
@@ -581,14 +578,15 @@ async function confirmMerge(gi) {
   }
 }
 
-async function deleteDupNote(id, gi) {
+async function deleteDupNote(id, gid) {
   await deleteNote(id);
   dupHighlightIds.delete(id);
-  if (currentDupGroups[gi]) {
-    currentDupGroups[gi].ids = currentDupGroups[gi].ids.filter(did => did !== id);
-    if (currentDupGroups[gi].ids.length < 2) {
-      currentDupGroups.splice(gi, 1);
-      const groupEl = document.getElementById('dupGroup' + gi);
+  const g = getGroupByGid(gid);
+  if (g) {
+    g.ids = g.ids.filter(did => did !== id);
+    if (g.ids.length < 2) {
+      removeGroupByGid(gid);
+      const groupEl = document.getElementById('dupGroup' + gid);
       if (groupEl) groupEl.remove();
     }
   }
@@ -599,12 +597,11 @@ async function deleteDupNote(id, gi) {
   renderFacilitatorRaw();
 }
 
-function dismissDupGroup(gi) {
-  if (currentDupGroups[gi]) {
-    currentDupGroups[gi].ids.forEach(id => dupHighlightIds.delete(id));
-    currentDupGroups.splice(gi, 1);
-  }
-  const groupEl = document.getElementById('dupGroup' + gi);
+function dismissDupGroup(gid) {
+  const g = getGroupByGid(gid);
+  if (g) g.ids.forEach(id => dupHighlightIds.delete(id));
+  removeGroupByGid(gid);
+  const groupEl = document.getElementById('dupGroup' + gid);
   if (groupEl) groupEl.remove();
   if (!document.getElementById('dupGroups').children.length) {
     document.getElementById('dupSection').style.display = 'none';
@@ -637,6 +634,14 @@ async function clearAll() {
   document.getElementById('dupSection').style.display = 'none';
   backToRaw();
   renderFacilitatorRaw();
+}
+
+async function editNoteText(id, text) {
+  const n = allNotes.find(n => n.id === id);
+  if (n && text.trim()) {
+    n.text = text.trim();
+    await apiFetch('/api/notes/' + id, { method: 'PATCH', body: JSON.stringify({ text: n.text }) });
+  }
 }
 
 async function runAI(context) {
@@ -754,13 +759,6 @@ async function renameGroup(id, name) {
   if (g && name.trim()) {
     g.name = name.trim();
     await apiFetch('/api/groups/' + id, { method: 'PATCH', body: JSON.stringify({ name: g.name }) });
-  }
-}
-async function editNoteText(id, text) {
-  const n = allNotes.find(n => n.id === id);
-  if (n && text.trim()) {
-    n.text = text.trim();
-    await apiFetch('/api/notes/' + id, { method: 'PATCH', body: JSON.stringify({ text: n.text }) });
   }
 }
 async function deleteGroup(id) {
