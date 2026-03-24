@@ -258,4 +258,3 @@ console.log('contents:', fs.existsSync(publicPath) ? fs.readdirSync(publicPath) 
 app.listen(PORT, () => {
   console.log(`BrainBoard server running on port ${PORT}`);
 });
-});
