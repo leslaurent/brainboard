@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainBoard — Collaborative Brainstorm</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #f5f0e8;
+  --cork: #c8a96e;
+  --cork-dark: #9a7040;
+  --ink: #1a1410;
+  --ink-muted: #6b5a45;
+  --note-yellow: #fef08a;
+  --note-pink: #fda4af;
+  --note-blue: #93c5fd;
+  --note-green: #86efac;
+  --note-orange: #fdba74;
+  --note-purple: #c4b5fd;
+  --note-teal: #5eead4;
+  --note-red: #fca5a5;
+  --accent: #d97706;
+  --panel: #fffdf7;
+  --shadow: rgba(26,20,16,0.18);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+
+.header{background:var(--ink);color:#fef3c7;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px var(--shadow);}
+.header h1{font-family:'Permanent Marker',cursive;font-size:1.45rem;letter-spacing:1px;}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.tabs{display:flex;gap:3px;background:rgba(255,255,255,0.08);border-radius:6px;padding:3px;}
+.tab-btn{font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;padding:5px 14px;border:none;border-radius:4px;cursor:pointer;background:transparent;color:#fef3c7;transition:all 0.2s;}
+.tab-btn.active{background:var(--accent);color:#fff;}
+.tab-btn:hover:not(.active){background:rgba(255,255,255,0.12);}
+
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── PARTICIPANT ── */
+.participant-wrap{max-width:560px;margin:48px auto;padding:0 20px;}
+.note-card{background:var(--note-yellow);border-radius:2px;padding:28px 28px 22px;box-shadow:4px 4px 0 var(--cork),6px 6px 14px var(--shadow);position:relative;}
+.note-card::before{content:'';width:22px;height:22px;background:radial-gradient(circle at 35% 35%,#ccc,#666);border-radius:50%;position:absolute;top:-11px;left:50%;transform:translateX(-50%);box-shadow:0 2px 6px rgba(0,0,0,0.35);}
+.note-card label{font-family:'Permanent Marker',cursive;font-size:1rem;color:var(--ink-muted);display:block;margin-bottom:12px;}
+.note-card textarea{width:100%;min-height:110px;font-family:'Permanent Marker',cursive;font-size:1rem;background:transparent;border:none;border-bottom:2px dashed rgba(0,0,0,0.15);outline:none;resize:vertical;color:var(--ink);line-height:1.75;padding-bottom:8px;}
+.note-meta{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.note-meta input{font-family:'DM Sans',sans-serif;font-size:0.85rem;background:rgba(0,0,0,0.07);border:none;border-radius:4px;padding:7px 10px;color:var(--ink);outline:none;width:175px;}
+.note-meta input::placeholder{color:var(--ink-muted);}
+
+.btn{font-family:'DM Sans',sans-serif;font-weight:600;font-size:0.85rem;padding:8px 18px;border:none;border-radius:4px;cursor:pointer;transition:all 0.15s;letter-spacing:0.2px;}
+.btn-primary{background:var(--ink);color:#fef3c7;}
+.btn-primary:hover{background:#2d2418;transform:translateY(-1px);}
+.btn-primary:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-accent:hover{background:#b45309;transform:translateY(-1px);}
+.btn-accent:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+.btn-ghost{background:transparent;color:var(--ink-muted);border:1.5px solid var(--cork);}
+.btn-ghost:hover{background:rgba(0,0,0,0.05);}
+.btn-sm{padding:5px 11px;font-size:0.75rem;}
+
+.status-msg{text-align:center;margin-top:16px;font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--ink-muted);}
+.submitted-pile{margin-top:30px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;}
+.mini-note{width:84px;height:84px;border-radius:2px;box-shadow:2px 2px 0 var(--cork),3px 3px 8px var(--shadow);display:flex;align-items:center;justify-content:center;font-family:'Permanent Marker',cursive;font-size:0.62rem;text-align:center;padding:8px;transform:rotate(var(--rot));}
+
+/* ── FACILITATOR ── */
+.fac-wrap{padding:20px 24px;}
+.reveal-bar{background:#1a1410;color:#fef3c7;border-radius:6px;padding:11px 18px;display:flex;align-items:center;gap:12px;margin-bottom:18px;font-family:'Space Mono',monospace;font-size:0.75rem;}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#444;border-radius:24px;cursor:pointer;transition:0.3s;}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:white;border-radius:50%;transition:0.3s;}
+input:checked+.toggle-slider{background:var(--accent);}
+input:checked+.toggle-slider::before{transform:translateX(20px);}
+
+.phase-label{font-family:'Space Mono',monospace;font-size:0.68rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-muted);padding:5px 0;border-bottom:1.5px solid var(--cork);margin-bottom:16px;}
+.toolbar{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:12px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;box-shadow:0 2px 8px var(--shadow);}
+.toolbar h2{font-family:'Space Mono',monospace;font-size:0.82rem;color:var(--ink-muted);flex:1;}
+.badge{font-family:'Space Mono',monospace;font-size:0.73rem;background:var(--ink);color:#fef3c7;padding:4px 10px;border-radius:4px;}
+
+.notes-wall{display:flex;flex-wrap:wrap;gap:14px;padding:10px 0 20px;}
+.wall-note{width:130px;min-height:120px;border-radius:2px;padding:12px 10px 8px;box-shadow:3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);position:relative;transform:rotate(var(--rot));transition:transform 0.2s,box-shadow 0.2s;}
+.wall-note:hover{transform:rotate(0deg) scale(1.05);box-shadow:4px 4px 0 var(--cork-dark),6px 6px 16px var(--shadow);z-index:5;}
+.wall-note .ntext{font-family:'Permanent Marker',cursive;font-size:0.76rem;line-height:1.55;word-break:break-word;}
+.wall-note .nauthor{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--ink-muted);margin-top:8px;text-align:right;}
+.wall-note .ndel{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;border:none;background:rgba(0,0,0,0.12);color:var(--ink);font-size:0.68rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;}
+.wall-note:hover .ndel{opacity:1;}
+
+.ai-panel{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:18px 20px;margin-bottom:20px;box-shadow:0 2px 8px var(--shadow);}
+.ai-panel h3{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:1px;margin-bottom:10px;color:var(--ink-muted);}
+.ai-panel textarea{width:100%;min-height:64px;resize:vertical;font-family:'DM Sans',sans-serif;font-size:0.87rem;border:1.5px solid var(--cork);border-radius:4px;padding:9px 12px;background:var(--bg);color:var(--ink);outline:none;}
+.ai-actions{margin-top:10px;display:flex;gap:10px;align-items:center;}
+.ai-loading{font-family:'Space Mono',monospace;font-size:0.73rem;color:var(--accent);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+
+.board-scroll{overflow-x:auto;padding-bottom:16px;}
+.board{display:flex;gap:16px;flex-wrap:nowrap;align-items:flex-start;padding:4px 2px;}
+.group-col{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:14px 14px 18px;min-width:195px;max-width:220px;flex:0 0 auto;box-shadow:0 2px 10px var(--shadow);transition:border-color 0.15s,background 0.15s;}
+.group-col.drag-over{border-color:var(--accent);background:#fffbf0;}
+.group-header{display:flex;align-items:center;gap:6px;margin-bottom:12px;}
+.group-name-input{font-family:'Permanent Marker',cursive;font-size:0.95rem;color:var(--ink);background:transparent;border:none;border-bottom:2px dashed var(--cork);outline:none;width:100%;padding:2px 4px;cursor:text;}
+.group-del{background:none;border:none;cursor:pointer;color:#ef4444;font-size:0.85rem;flex-shrink:0;padding:2px;}
+.group-notes{display:flex;flex-direction:column;gap:8px;min-height:60px;}
+.board-note{border-radius:2px;padding:10px 9px 7px;box-shadow:2px 2px 0 var(--cork-dark),3px 3px 8px var(--shadow);cursor:grab;position:relative;transform:rotate(var(--rot));transition:transform 0.15s;}
+.board-note:hover{transform:rotate(0deg) scale(1.03);z-index:5;}
+.board-note.dragging{opacity:0.35;}
+.bn-text{font-family:'Permanent Marker',cursive;font-size:0.73rem;line-height:1.55;word-break:break-word;outline:none;min-height:18px;}
+.bn-actions{display:flex;gap:4px;margin-top:6px;opacity:0;transition:opacity 0.15s;}
+.board-note:hover .bn-actions{opacity:1;}
+.bn-btn{font-size:0.6rem;padding:2px 7px;border-radius:3px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;}
+.bn-del{background:rgba(239,68,68,0.15);color:#ef4444;}
+
+.add-group-btn{background:transparent;border:2px dashed var(--cork);border-radius:7px;padding:16px 20px;cursor:pointer;font-family:'Permanent Marker',cursive;font-size:0.88rem;color:var(--ink-muted);min-width:160px;flex:0 0 auto;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.add-group-btn:hover{background:rgba(200,169,110,0.12);border-color:var(--cork-dark);}
+
+.export-panel{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:16px 20px;margin-top:22px;box-shadow:0 2px 8px var(--shadow);}
+.export-panel h3{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:1px;margin-bottom:10px;color:var(--ink-muted);}
+
+.auth-overlay{position:fixed;inset:0;background:rgba(26,20,16,0.72);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);}
+.auth-card{background:var(--note-yellow);border-radius:2px;padding:36px 40px;box-shadow:6px 6px 0 var(--cork-dark),10px 10px 24px var(--shadow);max-width:360px;width:90%;}
+.auth-card h2{font-family:'Permanent Marker',cursive;font-size:1.4rem;margin-bottom:6px;}
+.auth-card p{font-size:0.82rem;color:var(--ink-muted);margin-bottom:18px;line-height:1.55;}
+.auth-card input{width:100%;padding:10px 14px;border:2px solid var(--cork);border-radius:4px;font-family:'Space Mono',monospace;font-size:0.9rem;background:var(--bg);outline:none;margin-bottom:12px;}
+.auth-error{color:#ef4444;font-size:0.75rem;margin-bottom:8px;font-family:'Space Mono',monospace;}
+.auth-row{display:flex;gap:8px;}
+
+.nc0{background:var(--note-yellow);}
+.nc1{background:var(--note-pink);}
+.nc2{background:var(--note-blue);}
+.nc3{background:var(--note-green);}
+.nc4{background:var(--note-orange);}
+.nc5{background:var(--note-purple);}
+.nc6{background:var(--note-teal);}
+.nc7{background:var(--note-red);}
+
+.error-msg{background:#fee2e2;border:1.5px solid #fca5a5;border-radius:6px;padding:10px 14px;font-family:'Space Mono',monospace;font-size:0.75rem;color:#dc2626;margin-bottom:12px;}
+
+@media(max-width:600px){
+  .header{padding:10px 14px;}
+  .fac-wrap{padding:12px 10px;}
+  .participant-wrap{margin:28px auto;}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay" style="display:none;">
+  <div class="auth-card">
+    <h2>Facilitator Access</h2>
+    <p>Enter the facilitator password to manage this session.</p>
+    <input type="password" id="authInput" placeholder="Password" />
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-row">
+      <button class="btn btn-primary" onclick="checkAuth()" style="flex:1">Enter</button>
+      <button class="btn btn-ghost" onclick="cancelAuth()" style="flex:1">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>📌 BrainBoard</h1>
+  <div class="header-right">
+    <div class="tabs">
+      <button class="tab-btn active" id="tabParticipant" onclick="switchTab('participant',this)">✏️ Participant</button>
+      <button class="tab-btn" id="tabFacilitator" onclick="switchTab('facilitator',this)">🎯 Facilitator</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTICIPANT VIEW -->
+<div class="view active" id="view-participant">
+  <div class="participant-wrap">
+    <div class="note-card">
+      <label>What task comes to mind?</label>
+      <textarea id="noteText" placeholder="Write one task or idea per note..." maxlength="200"></textarea>
+      <div class="note-meta">
+        <input type="text" id="authorName" placeholder="Your name (optional)" maxlength="30" />
+        <button class="btn btn-primary" id="submitBtn" onclick="submitNote()">Post it →</button>
+      </div>
+    </div>
+    <div class="status-msg" id="statusMsg"></div>
+    <div class="submitted-pile" id="submittedPile"></div>
+  </div>
+</div>
+
+<!-- FACILITATOR VIEW -->
+<div class="view" id="view-facilitator">
+  <div class="fac-wrap">
+
+    <div class="reveal-bar">
+      <label class="toggle-switch">
+        <input type="checkbox" id="revealToggle" onchange="toggleReveal()" />
+        <span class="toggle-slider"></span>
+      </label>
+      <span id="revealLabel">Board is <strong>HIDDEN</strong> — participants cannot see others' notes</span>
+    </div>
+
+    <!-- Phase 1 -->
+    <div id="rawPhase">
+      <div class="phase-label">Phase 1 — Collected Notes</div>
+      <div class="toolbar">
+        <h2>All submitted notes</h2>
+        <span class="badge" id="noteCount">0 notes</span>
+        <button class="btn btn-ghost btn-sm" onclick="clearAll()">Clear all</button>
+      </div>
+      <div class="notes-wall" id="notesWall"></div>
+
+      <div class="ai-panel">
+        <h3>✦ AI GROUPING ENGINE</h3>
+        <textarea id="projectContext" placeholder="Optional: describe the project so AI can name groups well. E.g. 'New point-of-care diagnostic launch. Teams: R&D, Finance, Supply Chain, Lab Ops, Regulatory Affairs.'" rows="3"></textarea>
+        <div class="ai-actions">
+          <button class="btn btn-accent" id="aiBtn" onclick="runAI()">✦ Suggest groupings with AI</button>
+          <span class="ai-loading" id="aiLoading" style="display:none;">Thinking…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div id="groupedPhase" style="display:none;">
+      <div class="phase-label">Phase 2 — Review &amp; Organize</div>
+      <div class="toolbar">
+        <h2>Drag notes · Edit group names · Add / remove</h2>
+        <button class="btn btn-ghost btn-sm" onclick="backToRaw()">← Back to notes</button>
+        <button class="btn btn-accent btn-sm" onclick="runAI()">✦ Re-run AI</button>
+      </div>
+      <div class="board-scroll">
+        <div class="board" id="groupBoard"></div>
+      </div>
+      <div class="export-panel">
+        <h3>EXPORT SESSION</h3>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-primary" onclick="exportCSV()">⬇ Export CSV</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// CONFIG & STATE
+// ─────────────────────────────────────────────
+// When hosted on Railway, API calls go to the same origin (no CORS issues)
+const API = '';  // empty = same origin
+
+let authenticated = false;
+let facilitatorPassword = '';
+let allNotes = [];
+let allGroups = [];
+let revealed = false;
+let dragNoteId = null, dragSrcGroupId = null;
+
+const COLORS = ['nc0','nc1','nc2','nc3','nc4','nc5','nc6','nc7'];
+const ROTS   = [-3,-2.5,-2,-1.5,-1,0,1,1.5,2,2.5,3];
+const rnd = a => a[Math.floor(Math.random()*a.length)];
+let clientNextId = Date.now();
+const uid = () => String(clientNextId++);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// ─────────────────────────────────────────────
+// API HELPERS
+// ─────────────────────────────────────────────
+async function apiFetch(path, options = {}) {
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  if (authenticated) headers['x-facilitator-password'] = facilitatorPassword;
+  const resp = await fetch(API + path, { ...options, headers });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: resp.statusText }));
+    throw new Error(err.error || resp.statusText);
+  }
+  return resp.json();
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+async function init() {
+  try {
+    const settings = await apiFetch('/api/settings');
+    revealed = settings.revealed === 'true';
+    document.getElementById('revealToggle').checked = revealed;
+    updateRevealLabel();
+    await refreshNotes();
+  } catch(e) {
+    console.error('Init error:', e);
+  }
+  // Poll for new notes every 5 seconds
+  setInterval(async () => {
+    try { await refreshNotes(); } catch(_) {}
+  }, 5000);
+}
+
+async function refreshNotes() {
+  allNotes = await apiFetch('/api/notes');
+  renderSubmittedPile();
+  if (authenticated) renderFacilitatorRaw();
+}
+
+// ─────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────
+function switchTab(tab, btn) {
+  if (tab === 'facilitator' && !authenticated) {
+    showAuth();
+    return;
+  }
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showAuth() {
+  document.getElementById('authOverlay').style.display = 'flex';
+  document.getElementById('authInput').value = '';
+  document.getElementById('authError').textContent = '';
+  setTimeout(() => document.getElementById('authInput').focus(), 80);
+}
+function cancelAuth() {
+  document.getElementById('authOverlay').style.display = 'none';
+}
+async function checkAuth() {
+  const password = document.getElementById('authInput').value;
+  try {
+    await apiFetch('/api/auth', {
+      method: 'POST',
+      body: JSON.stringify({ password })
+    });
+    authenticated = true;
+    facilitatorPassword = password;
+    document.getElementById('authOverlay').style.display = 'none';
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('view-facilitator').classList.add('active');
+    document.getElementById('tabFacilitator').classList.add('active');
+    renderFacilitatorRaw();
+  } catch(e) {
+    document.getElementById('authError').textContent = 'Incorrect password.';
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('authInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAuth();
+  });
+  init();
+});
+
+// ─────────────────────────────────────────────
+// REVEAL
+// ─────────────────────────────────────────────
+async function toggleReveal() {
+  revealed = document.getElementById('revealToggle').checked;
+  updateRevealLabel();
+  await apiFetch('/api/settings', {
+    method: 'PATCH',
+    body: JSON.stringify({ key: 'revealed', value: revealed })
+  });
+  renderSubmittedPile();
+}
+function updateRevealLabel() {
+  document.getElementById('revealLabel').innerHTML = revealed
+    ? 'Board is <strong>VISIBLE</strong> — participants can see all posted notes'
+    : 'Board is <strong>HIDDEN</strong> — participants cannot see others\' notes';
+}
+
+// ─────────────────────────────────────────────
+// PARTICIPANT: SUBMIT
+// ─────────────────────────────────────────────
+async function submitNote() {
+  const text = document.getElementById('noteText').value.trim();
+  if (!text) return;
+  const author = document.getElementById('authorName').value.trim() || 'Anonymous';
+  const note = { id: uid(), text, author, color: rnd(COLORS), rot: rnd(ROTS) };
+
+  document.getElementById('submitBtn').disabled = true;
+  try {
+    await apiFetch('/api/notes', { method: 'POST', body: JSON.stringify(note) });
+    allNotes.push(note);
+    document.getElementById('noteText').value = '';
+    document.getElementById('statusMsg').textContent = '✓ Posted! Feel free to add another.';
+    setTimeout(() => document.getElementById('statusMsg').textContent = '', 1800);
+    renderSubmittedPile();
+    if (authenticated) renderFacilitatorRaw();
+  } catch(e) {
+    document.getElementById('statusMsg').textContent = 'Error posting note: ' + e.message;
+  } finally {
+    document.getElementById('submitBtn').disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function renderSubmittedPile() {
+  const pile = document.getElementById('submittedPile');
+  if (!revealed) { pile.innerHTML = ''; return; }
+  pile.innerHTML = allNotes.map(n =>
+    `<div class="mini-note ${n.color}" style="--rot:${n.rot}deg">${esc(n.text.substring(0,40))}</div>`
+  ).join('');
+}
+
+function renderFacilitatorRaw() {
+  document.getElementById('noteCount').textContent =
+    allNotes.length + ' note' + (allNotes.length !== 1 ? 's' : '');
+  document.getElementById('notesWall').innerHTML = allNotes.map(n => `
+    <div class="wall-note ${n.color}" style="--rot:${n.rot}deg">
+      <button class="ndel" onclick="deleteNote('${n.id}')">✕</button>
+      <div class="ntext">${esc(n.text)}</div>
+      <div class="nauthor">${esc(n.author)}</div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────
+// DELETE / CLEAR
+// ─────────────────────────────────────────────
+async function deleteNote(id) {
+  await apiFetch('/api/notes/' + id, { method: 'DELETE' });
+  allNotes = allNotes.filter(n => n.id !== id);
+  allGroups.forEach(g => { g.noteIds = g.noteIds.filter(nid => nid !== id); });
+  renderFacilitatorRaw();
+  if (document.getElementById('groupedPhase').style.display !== 'none') renderBoard();
+}
+
+async function clearAll() {
+  if (!confirm('Delete ALL notes and groups? This cannot be undone.')) return;
+  await apiFetch('/api/notes', { method: 'DELETE' });
+  allNotes = []; allGroups = [];
+  backToRaw();
+  renderFacilitatorRaw();
+}
+
+// ─────────────────────────────────────────────
+// AI GROUPING
+// ─────────────────────────────────────────────
+async function runAI() {
+  if (allNotes.length < 2) { alert('Add at least 2 notes first.'); return; }
+  const btn = document.getElementById('aiBtn');
+  const loading = document.getElementById('aiLoading');
+  btn.disabled = true; loading.style.display = 'inline';
+
+  const context = document.getElementById('projectContext').value.trim();
+  try {
+    const parsed = await apiFetch('/api/ai/group', {
+      method: 'POST',
+      body: JSON.stringify({ context })
+    });
+
+    const usedIds = new Set();
+    allGroups = parsed.groups.map((g, i) => ({
+      id: uid(),
+      name: g.name,
+      noteIds: g.noteIds.filter(id => allNotes.find(n => n.id === id)),
+      color: COLORS[i % COLORS.length]
+    }));
+    allGroups.forEach(g => g.noteIds.forEach(id => usedIds.add(id)));
+
+    const ungrouped = allNotes.filter(n => !usedIds.has(n.id)).map(n => n.id);
+    if (ungrouped.length) {
+      allGroups.push({ id: uid(), name: 'Uncategorized', noteIds: ungrouped, color: 'nc0' });
+    }
+
+    await saveGroups();
+    showGroupedPhase();
+  } catch(err) {
+    alert('AI grouping failed: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.disabled = false; loading.style.display = 'none';
+  }
+}
+
+async function saveGroups() {
+  await apiFetch('/api/groups', {
+    method: 'POST',
+    body: JSON.stringify({ groups: allGroups })
+  });
+}
+
+// ─────────────────────────────────────────────
+// GROUPED BOARD
+// ─────────────────────────────────────────────
+function showGroupedPhase() {
+  document.getElementById('rawPhase').style.display = 'none';
+  document.getElementById('groupedPhase').style.display = 'block';
+  renderBoard();
+}
+function backToRaw() {
+  document.getElementById('rawPhase').style.display = 'block';
+  document.getElementById('groupedPhase').style.display = 'none';
+  renderFacilitatorRaw();
+}
+
+function getNoteById(id) { return allNotes.find(n => n.id === id); }
+
+function renderBoard() {
+  const board = document.getElementById('groupBoard');
+  board.innerHTML = '';
+
+  allGroups.forEach(g => {
+    const col = document.createElement('div');
+    col.className = 'group-col';
+    col.dataset.groupId = g.id;
+    col.innerHTML = `
+      <div class="group-header">
+        <input class="group-name-input" value="${esc(g.name)}"
+          onblur="renameGroup('${g.id}',this.value)"
+          onkeydown="if(event.key==='Enter')this.blur()" />
+        <button class="group-del" onclick="deleteGroup('${g.id}')" title="Delete group">✕</button>
+      </div>
+      <div class="group-notes" data-group-id="${g.id}">
+        ${g.noteIds.map(nid => {
+          const n = getNoteById(nid);
+          if (!n) return '';
+          return `<div class="board-note ${n.color}" style="--rot:${n.rot}deg"
+                    draggable="true" data-note-id="${n.id}">
+            <div class="bn-text" contenteditable="true"
+              onblur="editNoteText('${n.id}',this.innerText)"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${esc(n.text)}</div>
+            <div class="bn-actions">
+              <button class="bn-btn bn-del" onclick="deleteNote('${n.id}')">✕ remove</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    board.appendChild(col);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-group-btn';
+  addBtn.textContent = '+ New group';
+  addBtn.onclick = addGroup;
+  board.appendChild(addBtn);
+
+  setupDragDrop();
+}
+
+// ─────────────────────────────────────────────
+// DRAG AND DROP
+// ─────────────────────────────────────────────
+function setupDragDrop() {
+  document.querySelectorAll('.board-note').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      dragNoteId = el.dataset.noteId;
+      dragSrcGroupId = el.closest('[data-group-id]').dataset.groupId;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  });
+
+  document.querySelectorAll('.group-notes').forEach(zone => {
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      zone.closest('.group-col').classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', () =>
+      zone.closest('.group-col').classList.remove('drag-over'));
+    zone.addEventListener('drop', async e => {
+      e.preventDefault();
+      zone.closest('.group-col').classList.remove('drag-over');
+      const tgtGroupId = zone.dataset.groupId;
+      if (!dragNoteId || tgtGroupId === dragSrcGroupId) return;
+      const src = allGroups.find(g => g.id === dragSrcGroupId);
+      const tgt = allGroups.find(g => g.id === tgtGroupId);
+      if (src) src.noteIds = src.noteIds.filter(id => id !== dragNoteId);
+      if (tgt && !tgt.noteIds.includes(dragNoteId)) tgt.noteIds.push(dragNoteId);
+      dragNoteId = null;
+      await saveGroups();
+      renderBoard();
+    });
+  });
+}
+
+// ─────────────────────────────────────────────
+// EDIT / MANAGE
+// ─────────────────────────────────────────────
+async function renameGroup(id, name) {
+  const g = allGroups.find(g => g.id === id);
+  if (g && name.trim()) {
+    g.name = name.trim();
+    await apiFetch('/api/groups/' + id, { method: 'PATCH', body: JSON.stringify({ name: g.name }) });
+  }
+}
+
+async function editNoteText(id, text) {
+  const n = allNotes.find(n => n.id === id);
+  if (n && text.trim()) {
+    n.text = text.trim();
+    await apiFetch('/api/notes/' + id, { method: 'PATCH', body: JSON.stringify({ text: n.text }) });
+  }
+}
+
+async function deleteGroup(id) {
+  const g = allGroups.find(g => g.id === id);
+  if (!g) return;
+  if (g.noteIds.length && !confirm(`Delete group "${g.name}"? Its ${g.noteIds.length} note(s) will move to Uncategorized.`)) return;
+  let unc = allGroups.find(g => g.name === 'Uncategorized');
+  if (!unc) { unc = { id: uid(), name: 'Uncategorized', noteIds: [], color: 'nc0' }; allGroups.push(unc); }
+  unc.noteIds.push(...g.noteIds);
+  allGroups = allGroups.filter(gr => gr.id !== id);
+  await apiFetch('/api/groups/' + id, { method: 'DELETE' });
+  await saveGroups();
+  renderBoard();
+}
+
+async function addGroup() {
+  allGroups.push({ id: uid(), name: 'New Group', noteIds: [], color: rnd(COLORS) });
+  await saveGroups();
+  renderBoard();
+}
+
+// ─────────────────────────────────────────────
+// EXPORT
+// ─────────────────────────────────────────────
+function exportCSV() {
+  const rows = [['Group', 'Task', 'Contributor']];
+  allGroups.forEach(g => {
+    if (!g.noteIds.length) { rows.push([g.name, '', '']); return; }
+    g.noteIds.forEach(nid => {
+      const n = getNoteById(nid);
+      if (n) rows.push([g.name, n.text, n.author]);
+    });
+  });
+  const csv = rows.map(r =>
+    r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')
+  ).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'brainboard_export.csv';
+  a.click();
+}
+</script>
+</body>
+</html>
