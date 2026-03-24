@@ -249,7 +249,13 @@ console.log('public path:', publicPath);
 console.log('public exists:', fs.existsSync(publicPath));
 console.log('public contents:', fs.existsSync(publicPath) ? fs.readdirSync(publicPath) : 'N/A');
 
-// ── START ──
+const fs = require('fs');
+const publicPath = path.join(__dirname, 'public');
+console.log('__dirname:', __dirname);
+console.log('public exists:', fs.existsSync(publicPath));
+console.log('contents:', fs.existsSync(publicPath) ? fs.readdirSync(publicPath) : 'MISSING');
+
 app.listen(PORT, () => {
   console.log(`BrainBoard server running on port ${PORT}`);
+});
 });
