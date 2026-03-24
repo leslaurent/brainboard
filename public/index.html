@@ -24,6 +24,7 @@
   --accent: #d97706;
   --panel: #fffdf7;
   --shadow: rgba(26,20,16,0.18);
+  --dup-highlight: #f97316;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -59,6 +60,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .btn-accent:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
 .btn-ghost{background:transparent;color:var(--ink-muted);border:1.5px solid var(--cork);}
 .btn-ghost:hover{background:rgba(0,0,0,0.05);}
+.btn-warn{background:#f97316;color:#fff;}
+.btn-warn:hover{background:#ea6c0a;transform:translateY(-1px);}
 .btn-sm{padding:5px 11px;font-size:0.75rem;}
 
 .status-msg{text-align:center;margin-top:16px;font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--ink-muted);}
@@ -80,21 +83,37 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .toolbar h2{font-family:'Space Mono',monospace;font-size:0.82rem;color:var(--ink-muted);flex:1;}
 .badge{font-family:'Space Mono',monospace;font-size:0.73rem;background:var(--ink);color:#fef3c7;padding:4px 10px;border-radius:4px;}
 
+/* ── NOTES WALL ── */
 .notes-wall{display:flex;flex-wrap:wrap;gap:14px;padding:10px 0 20px;}
 .wall-note{width:130px;min-height:120px;border-radius:2px;padding:12px 10px 8px;box-shadow:3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);position:relative;transform:rotate(var(--rot));transition:transform 0.2s,box-shadow 0.2s;}
 .wall-note:hover{transform:rotate(0deg) scale(1.05);box-shadow:4px 4px 0 var(--cork-dark),6px 6px 16px var(--shadow);z-index:5;}
+.wall-note.is-dup{box-shadow:0 0 0 3px var(--dup-highlight),3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);}
 .wall-note .ntext{font-family:'Permanent Marker',cursive;font-size:0.76rem;line-height:1.55;word-break:break-word;}
 .wall-note .nauthor{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--ink-muted);margin-top:8px;text-align:right;}
 .wall-note .ndel{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;border:none;background:rgba(0,0,0,0.12);color:var(--ink);font-size:0.68rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;}
 .wall-note:hover .ndel{opacity:1;}
+.dup-badge{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--dup-highlight);color:#fff;font-family:'Space Mono',monospace;font-size:0.55rem;padding:2px 6px;border-radius:8px;white-space:nowrap;font-weight:700;}
 
+/* ── DUPLICATE SECTION ── */
+.dup-section{background:#fff8f0;border:2px solid var(--dup-highlight);border-radius:8px;padding:16px 18px;margin-bottom:20px;}
+.dup-section h3{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:1px;color:var(--dup-highlight);margin-bottom:12px;}
+.dup-group{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2);border-radius:6px;padding:12px 14px;margin-bottom:10px;}
+.dup-group:last-child{margin-bottom:0;}
+.dup-reason{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--ink-muted);margin-bottom:10px;font-style:italic;}
+.dup-notes{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.dup-note-preview{background:var(--note-yellow);border-radius:2px;padding:8px 10px;font-family:'Permanent Marker',cursive;font-size:0.72rem;max-width:200px;box-shadow:2px 2px 0 var(--cork-dark);line-height:1.4;}
+.dup-note-preview .dup-note-author{font-family:'Space Mono',monospace;font-size:0.55rem;color:var(--ink-muted);margin-top:4px;}
+.dup-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ── AI PANEL ── */
 .ai-panel{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:18px 20px;margin-bottom:20px;box-shadow:0 2px 8px var(--shadow);}
 .ai-panel h3{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:1px;margin-bottom:10px;color:var(--ink-muted);}
 .ai-panel textarea{width:100%;min-height:64px;resize:vertical;font-family:'DM Sans',sans-serif;font-size:0.87rem;border:1.5px solid var(--cork);border-radius:4px;padding:9px 12px;background:var(--bg);color:var(--ink);outline:none;}
-.ai-actions{margin-top:10px;display:flex;gap:10px;align-items:center;}
+.ai-actions{margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 .ai-loading{font-family:'Space Mono',monospace;font-size:0.73rem;color:var(--accent);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
 
+/* ── BOARD ── */
 .board-scroll{overflow-x:auto;padding-bottom:16px;}
 .board{display:flex;gap:16px;flex-wrap:nowrap;align-items:flex-start;padding:4px 2px;}
 .group-col{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:14px 14px 18px;min-width:195px;max-width:220px;flex:0 0 auto;box-shadow:0 2px 10px var(--shadow);transition:border-color 0.15s,background 0.15s;}
@@ -118,6 +137,7 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .export-panel{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:16px 20px;margin-top:22px;box-shadow:0 2px 8px var(--shadow);}
 .export-panel h3{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:1px;margin-bottom:10px;color:var(--ink-muted);}
 
+/* ── AUTH ── */
 .auth-overlay{position:fixed;inset:0;background:rgba(26,20,16,0.72);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);}
 .auth-card{background:var(--note-yellow);border-radius:2px;padding:36px 40px;box-shadow:6px 6px 0 var(--cork-dark),10px 10px 24px var(--shadow);max-width:360px;width:90%;}
 .auth-card h2{font-family:'Permanent Marker',cursive;font-size:1.4rem;margin-bottom:6px;}
@@ -134,8 +154,6 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .nc5{background:var(--note-purple);}
 .nc6{background:var(--note-teal);}
 .nc7{background:var(--note-red);}
-
-.error-msg{background:#fee2e2;border:1.5px solid #fca5a5;border-radius:6px;padding:10px 14px;font-family:'Space Mono',monospace;font-size:0.75rem;color:#dc2626;margin-bottom:12px;}
 
 @media(max-width:600px){
   .header{padding:10px 14px;}
@@ -207,10 +225,24 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
         <span class="badge" id="noteCount">0 notes</span>
         <button class="btn btn-ghost btn-sm" onclick="clearAll()">Clear all</button>
       </div>
+
+      <!-- Duplicate section (hidden until AI finds some) -->
+      <div class="dup-section" id="dupSection" style="display:none;">
+        <h3>⚠ POSSIBLE DUPLICATES — Review with your team</h3>
+        <div id="dupGroups"></div>
+        <div style="margin-top:10px;">
+          <button class="btn btn-ghost btn-sm" onclick="dismissAllDups()">Dismiss all</button>
+        </div>
+      </div>
+
       <div class="notes-wall" id="notesWall"></div>
 
       <div class="ai-panel">
-        <h3>✦ AI GROUPING ENGINE</h3>
+        <h3>✦ AI TOOLS</h3>
+        <div class="ai-actions" style="margin-top:0;margin-bottom:12px;">
+          <button class="btn btn-warn btn-sm" id="dupBtn" onclick="findDuplicates()">⚑ Find duplicates</button>
+          <span class="ai-loading" id="dupLoading" style="display:none;">Scanning…</span>
+        </div>
         <textarea id="projectContext" placeholder="Optional: describe the project so AI can name groups well. E.g. 'New point-of-care diagnostic launch. Teams: R&D, Finance, Supply Chain, Lab Ops, Regulatory Affairs.'" rows="3"></textarea>
         <div class="ai-actions">
           <button class="btn btn-accent" id="aiBtn" onclick="runAI()">✦ Suggest groupings with AI</button>
@@ -242,18 +274,14 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 </div>
 
 <script>
-// ─────────────────────────────────────────────
-// CONFIG & STATE
-// ─────────────────────────────────────────────
-// When hosted on Railway, API calls go to the same origin (no CORS issues)
-const API = '';  // empty = same origin
-
+const API = '';
 let authenticated = false;
 let facilitatorPassword = '';
 let allNotes = [];
 let allGroups = [];
 let revealed = false;
 let dragNoteId = null, dragSrcGroupId = null;
+let dupHighlightIds = new Set();
 
 const COLORS = ['nc0','nc1','nc2','nc3','nc4','nc5','nc6','nc7'];
 const ROTS   = [-3,-2.5,-2,-1.5,-1,0,1,1.5,2,2.5,3];
@@ -262,9 +290,6 @@ let clientNextId = Date.now();
 const uid = () => String(clientNextId++);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-// ─────────────────────────────────────────────
-// API HELPERS
-// ─────────────────────────────────────────────
 async function apiFetch(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (authenticated) headers['x-facilitator-password'] = facilitatorPassword;
@@ -276,9 +301,6 @@ async function apiFetch(path, options = {}) {
   return resp.json();
 }
 
-// ─────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────
 async function init() {
   try {
     const settings = await apiFetch('/api/settings');
@@ -286,13 +308,8 @@ async function init() {
     document.getElementById('revealToggle').checked = revealed;
     updateRevealLabel();
     await refreshNotes();
-  } catch(e) {
-    console.error('Init error:', e);
-  }
-  // Poll for new notes every 5 seconds
-  setInterval(async () => {
-    try { await refreshNotes(); } catch(_) {}
-  }, 5000);
+  } catch(e) { console.error('Init error:', e); }
+  setInterval(async () => { try { await refreshNotes(); } catch(_) {} }, 5000);
 }
 
 async function refreshNotes() {
@@ -301,14 +318,8 @@ async function refreshNotes() {
   if (authenticated) renderFacilitatorRaw();
 }
 
-// ─────────────────────────────────────────────
-// AUTH
-// ─────────────────────────────────────────────
 function switchTab(tab, btn) {
-  if (tab === 'facilitator' && !authenticated) {
-    showAuth();
-    return;
-  }
+  if (tab === 'facilitator' && !authenticated) { showAuth(); return; }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + tab).classList.add('active');
@@ -321,16 +332,12 @@ function showAuth() {
   document.getElementById('authError').textContent = '';
   setTimeout(() => document.getElementById('authInput').focus(), 80);
 }
-function cancelAuth() {
-  document.getElementById('authOverlay').style.display = 'none';
-}
+function cancelAuth() { document.getElementById('authOverlay').style.display = 'none'; }
+
 async function checkAuth() {
   const password = document.getElementById('authInput').value;
   try {
-    await apiFetch('/api/auth', {
-      method: 'POST',
-      body: JSON.stringify({ password })
-    });
+    await apiFetch('/api/auth', { method: 'POST', body: JSON.stringify({ password }) });
     authenticated = true;
     facilitatorPassword = password;
     document.getElementById('authOverlay').style.display = 'none';
@@ -343,40 +350,29 @@ async function checkAuth() {
     document.getElementById('authError').textContent = 'Incorrect password.';
   }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('authInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkAuth();
-  });
+  document.getElementById('authInput').addEventListener('keydown', e => { if(e.key==='Enter') checkAuth(); });
   init();
 });
 
-// ─────────────────────────────────────────────
-// REVEAL
-// ─────────────────────────────────────────────
 async function toggleReveal() {
   revealed = document.getElementById('revealToggle').checked;
   updateRevealLabel();
-  await apiFetch('/api/settings', {
-    method: 'PATCH',
-    body: JSON.stringify({ key: 'revealed', value: revealed })
-  });
+  await apiFetch('/api/settings', { method: 'PATCH', body: JSON.stringify({ key: 'revealed', value: revealed }) });
   renderSubmittedPile();
 }
 function updateRevealLabel() {
   document.getElementById('revealLabel').innerHTML = revealed
     ? 'Board is <strong>VISIBLE</strong> — participants can see all posted notes'
-    : 'Board is <strong>HIDDEN</strong> — participants cannot see others\' notes';
+    : 'Board is <strong>HIDDEN</strong> — participants cannot see others\'s notes';
 }
 
-// ─────────────────────────────────────────────
-// PARTICIPANT: SUBMIT
-// ─────────────────────────────────────────────
 async function submitNote() {
   const text = document.getElementById('noteText').value.trim();
   if (!text) return;
   const author = document.getElementById('authorName').value.trim() || 'Anonymous';
   const note = { id: uid(), text, author, color: rnd(COLORS), rot: rnd(ROTS) };
-
   document.getElementById('submitBtn').disabled = true;
   try {
     await apiFetch('/api/notes', { method: 'POST', body: JSON.stringify(note) });
@@ -387,15 +383,12 @@ async function submitNote() {
     renderSubmittedPile();
     if (authenticated) renderFacilitatorRaw();
   } catch(e) {
-    document.getElementById('statusMsg').textContent = 'Error posting note: ' + e.message;
+    document.getElementById('statusMsg').textContent = 'Error: ' + e.message;
   } finally {
     document.getElementById('submitBtn').disabled = false;
   }
 }
 
-// ─────────────────────────────────────────────
-// RENDER
-// ─────────────────────────────────────────────
 function renderSubmittedPile() {
   const pile = document.getElementById('submittedPile');
   if (!revealed) { pile.innerHTML = ''; return; }
@@ -407,17 +400,122 @@ function renderSubmittedPile() {
 function renderFacilitatorRaw() {
   document.getElementById('noteCount').textContent =
     allNotes.length + ' note' + (allNotes.length !== 1 ? 's' : '');
-  document.getElementById('notesWall').innerHTML = allNotes.map(n => `
-    <div class="wall-note ${n.color}" style="--rot:${n.rot}deg">
+  document.getElementById('notesWall').innerHTML = allNotes.map(n => {
+    const isDup = dupHighlightIds.has(n.id);
+    return `<div class="wall-note ${n.color}${isDup ? ' is-dup' : ''}" style="--rot:${n.rot}deg">
+      ${isDup ? `<div class="dup-badge">possible duplicate</div>` : ''}
       <button class="ndel" onclick="deleteNote('${n.id}')">✕</button>
       <div class="ntext">${esc(n.text)}</div>
       <div class="nauthor">${esc(n.author)}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-// ─────────────────────────────────────────────
-// DELETE / CLEAR
-// ─────────────────────────────────────────────
+// ── DUPLICATE DETECTION ──
+async function findDuplicates() {
+  if (allNotes.length < 2) { alert('Add at least 2 notes first.'); return; }
+  const btn = document.getElementById('dupBtn');
+  const loading = document.getElementById('dupLoading');
+  btn.disabled = true; loading.style.display = 'inline';
+
+  try {
+    const result = await apiFetch('/api/ai/duplicates', { method: 'POST', body: JSON.stringify({}) });
+    dupHighlightIds = new Set();
+
+    if (!result.duplicateGroups || result.duplicateGroups.length === 0) {
+      document.getElementById('dupSection').style.display = 'none';
+      alert('No duplicates found — all notes look distinct.');
+      return;
+    }
+
+    result.duplicateGroups.forEach(g => g.ids.forEach(id => dupHighlightIds.add(id)));
+    renderFacilitatorRaw();
+    renderDupSection(result.duplicateGroups);
+  } catch(err) {
+    alert('Duplicate detection failed: ' + err.message);
+  } finally {
+    btn.disabled = false; loading.style.display = 'none';
+  }
+}
+
+function renderDupSection(dupGroups) {
+  const section = document.getElementById('dupSection');
+  const container = document.getElementById('dupGroups');
+  section.style.display = 'block';
+
+  container.innerHTML = dupGroups.map((g, gi) => {
+    const notePreviews = g.ids.map(id => {
+      const n = allNotes.find(n => n.id === id);
+      if (!n) return '';
+      return `<div class="dup-note-preview ${n.color}">
+        ${esc(n.text)}
+        <div class="dup-note-author">${esc(n.author)}</div>
+      </div>`;
+    }).join('');
+
+    const deleteButtons = g.ids.map(id => {
+      const n = allNotes.find(n => n.id === id);
+      if (!n) return '';
+      return `<button class="btn btn-ghost btn-sm" onclick="deleteDupNote('${id}', ${gi})">
+        Delete "${esc(n.text.substring(0,20))}${n.text.length>20?'…':''}"
+      </button>`;
+    }).join('');
+
+    return `<div class="dup-group" id="dupGroup${gi}">
+      <div class="dup-reason">💬 ${esc(g.reason)}</div>
+      <div class="dup-notes">${notePreviews}</div>
+      <div class="dup-actions">
+        ${deleteButtons}
+        <button class="btn btn-ghost btn-sm" onclick="dismissDupGroup(${gi})">Keep all</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteDupNote(id, groupIndex) {
+  await deleteNote(id);
+  dupHighlightIds.delete(id);
+  // Remove this note from the dup group display
+  const groupEl = document.getElementById('dupGroup' + groupIndex);
+  if (groupEl) {
+    const remaining = groupEl.querySelectorAll('.dup-note-preview').length - 1;
+    if (remaining < 2) {
+      groupEl.remove();
+      dupHighlightIds.forEach(did => {
+        // Check if dupSection is now empty
+      });
+    }
+  }
+  // Hide section if no more groups
+  if (!document.getElementById('dupGroups').children.length) {
+    document.getElementById('dupSection').style.display = 'none';
+    dupHighlightIds.clear();
+  }
+  renderFacilitatorRaw();
+}
+
+function dismissDupGroup(groupIndex) {
+  const groupEl = document.getElementById('dupGroup' + groupIndex);
+  if (groupEl) {
+    // Remove highlights for notes in this group
+    groupEl.querySelectorAll('.dup-note-preview').forEach(el => {
+      // We don't have the IDs here easily, so just clear all and re-render
+    });
+    groupEl.remove();
+  }
+  if (!document.getElementById('dupGroups').children.length) {
+    document.getElementById('dupSection').style.display = 'none';
+    dupHighlightIds.clear();
+    renderFacilitatorRaw();
+  }
+}
+
+function dismissAllDups() {
+  document.getElementById('dupSection').style.display = 'none';
+  dupHighlightIds.clear();
+  renderFacilitatorRaw();
+}
+
 async function deleteNote(id) {
   await apiFetch('/api/notes/' + id, { method: 'DELETE' });
   allNotes = allNotes.filter(n => n.id !== id);
@@ -430,60 +528,42 @@ async function clearAll() {
   if (!confirm('Delete ALL notes and groups? This cannot be undone.')) return;
   await apiFetch('/api/notes', { method: 'DELETE' });
   allNotes = []; allGroups = [];
+  dupHighlightIds.clear();
+  document.getElementById('dupSection').style.display = 'none';
   backToRaw();
   renderFacilitatorRaw();
 }
 
-// ─────────────────────────────────────────────
-// AI GROUPING
-// ─────────────────────────────────────────────
 async function runAI() {
   if (allNotes.length < 2) { alert('Add at least 2 notes first.'); return; }
   const btn = document.getElementById('aiBtn');
   const loading = document.getElementById('aiLoading');
   btn.disabled = true; loading.style.display = 'inline';
-
   const context = document.getElementById('projectContext').value.trim();
   try {
-    const parsed = await apiFetch('/api/ai/group', {
-      method: 'POST',
-      body: JSON.stringify({ context })
-    });
-
+    const parsed = await apiFetch('/api/ai/group', { method: 'POST', body: JSON.stringify({ context }) });
     const usedIds = new Set();
     allGroups = parsed.groups.map((g, i) => ({
-      id: uid(),
-      name: g.name,
+      id: uid(), name: g.name,
       noteIds: g.noteIds.filter(id => allNotes.find(n => n.id === id)),
       color: COLORS[i % COLORS.length]
     }));
     allGroups.forEach(g => g.noteIds.forEach(id => usedIds.add(id)));
-
     const ungrouped = allNotes.filter(n => !usedIds.has(n.id)).map(n => n.id);
-    if (ungrouped.length) {
-      allGroups.push({ id: uid(), name: 'Uncategorized', noteIds: ungrouped, color: 'nc0' });
-    }
-
+    if (ungrouped.length) allGroups.push({ id: uid(), name: 'Uncategorized', noteIds: ungrouped, color: 'nc0' });
     await saveGroups();
     showGroupedPhase();
   } catch(err) {
     alert('AI grouping failed: ' + err.message);
-    console.error(err);
   } finally {
     btn.disabled = false; loading.style.display = 'none';
   }
 }
 
 async function saveGroups() {
-  await apiFetch('/api/groups', {
-    method: 'POST',
-    body: JSON.stringify({ groups: allGroups })
-  });
+  await apiFetch('/api/groups', { method: 'POST', body: JSON.stringify({ groups: allGroups }) });
 }
 
-// ─────────────────────────────────────────────
-// GROUPED BOARD
-// ─────────────────────────────────────────────
 function showGroupedPhase() {
   document.getElementById('rawPhase').style.display = 'none';
   document.getElementById('groupedPhase').style.display = 'block';
@@ -500,7 +580,6 @@ function getNoteById(id) { return allNotes.find(n => n.id === id); }
 function renderBoard() {
   const board = document.getElementById('groupBoard');
   board.innerHTML = '';
-
   allGroups.forEach(g => {
     const col = document.createElement('div');
     col.className = 'group-col';
@@ -510,7 +589,7 @@ function renderBoard() {
         <input class="group-name-input" value="${esc(g.name)}"
           onblur="renameGroup('${g.id}',this.value)"
           onkeydown="if(event.key==='Enter')this.blur()" />
-        <button class="group-del" onclick="deleteGroup('${g.id}')" title="Delete group">✕</button>
+        <button class="group-del" onclick="deleteGroup('${g.id}')">✕</button>
       </div>
       <div class="group-notes" data-group-id="${g.id}">
         ${g.noteIds.map(nid => {
@@ -529,19 +608,14 @@ function renderBoard() {
       </div>`;
     board.appendChild(col);
   });
-
   const addBtn = document.createElement('button');
   addBtn.className = 'add-group-btn';
   addBtn.textContent = '+ New group';
   addBtn.onclick = addGroup;
   board.appendChild(addBtn);
-
   setupDragDrop();
 }
 
-// ─────────────────────────────────────────────
-// DRAG AND DROP
-// ─────────────────────────────────────────────
 function setupDragDrop() {
   document.querySelectorAll('.board-note').forEach(el => {
     el.addEventListener('dragstart', e => {
@@ -552,14 +626,9 @@ function setupDragDrop() {
     });
     el.addEventListener('dragend', () => el.classList.remove('dragging'));
   });
-
   document.querySelectorAll('.group-notes').forEach(zone => {
-    zone.addEventListener('dragover', e => {
-      e.preventDefault();
-      zone.closest('.group-col').classList.add('drag-over');
-    });
-    zone.addEventListener('dragleave', () =>
-      zone.closest('.group-col').classList.remove('drag-over'));
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.closest('.group-col').classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.closest('.group-col').classList.remove('drag-over'));
     zone.addEventListener('drop', async e => {
       e.preventDefault();
       zone.closest('.group-col').classList.remove('drag-over');
@@ -576,9 +645,6 @@ function setupDragDrop() {
   });
 }
 
-// ─────────────────────────────────────────────
-// EDIT / MANAGE
-// ─────────────────────────────────────────────
 async function renameGroup(id, name) {
   const g = allGroups.find(g => g.id === id);
   if (g && name.trim()) {
@@ -586,7 +652,6 @@ async function renameGroup(id, name) {
     await apiFetch('/api/groups/' + id, { method: 'PATCH', body: JSON.stringify({ name: g.name }) });
   }
 }
-
 async function editNoteText(id, text) {
   const n = allNotes.find(n => n.id === id);
   if (n && text.trim()) {
@@ -594,7 +659,6 @@ async function editNoteText(id, text) {
     await apiFetch('/api/notes/' + id, { method: 'PATCH', body: JSON.stringify({ text: n.text }) });
   }
 }
-
 async function deleteGroup(id) {
   const g = allGroups.find(g => g.id === id);
   if (!g) return;
@@ -607,16 +671,12 @@ async function deleteGroup(id) {
   await saveGroups();
   renderBoard();
 }
-
 async function addGroup() {
   allGroups.push({ id: uid(), name: 'New Group', noteIds: [], color: rnd(COLORS) });
   await saveGroups();
   renderBoard();
 }
 
-// ─────────────────────────────────────────────
-// EXPORT
-// ─────────────────────────────────────────────
 function exportCSV() {
   const rows = [['Group', 'Task', 'Contributor']];
   allGroups.forEach(g => {
@@ -626,9 +686,7 @@ function exportCSV() {
       if (n) rows.push([g.name, n.text, n.author]);
     });
   });
-  const csv = rows.map(r =>
-    r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')
-  ).join('\r\n');
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
   a.download = 'brainboard_export.csv';
