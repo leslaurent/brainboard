@@ -165,6 +165,55 @@ app.patch('/api/settings', requireFacilitator, (req, res) => {
   res.json({ ok: true });
 });
 
+// ── AI DUPLICATE DETECTION ──
+app.post('/api/ai/duplicates', requireFacilitator, async (req, res) => {
+  const notes = db.prepare('SELECT * FROM notes ORDER BY created_at ASC').all();
+  if (notes.length < 2) {
+    return res.status(400).json({ error: 'Need at least 2 notes.' });
+  }
+  const notesList = notes.map(n => `- [${n.id}] ${n.text}`).join('\n');
+  const prompt = `You are helping a team find duplicate or near-duplicate tasks in a brainstorming session.
+
+Here are the submitted tasks (each has an ID in brackets):
+${notesList}
+
+Find groups of notes that are duplicates or near-duplicates (same intent, even if worded differently).
+Return ONLY valid JSON — no explanation, no markdown fences, nothing else:
+{"duplicateGroups":[{"ids":["id1","id2"],"reason":"Brief reason why these are similar"}]}
+
+Rules:
+- Only include groups where there are 2 or more genuinely similar notes
+- If no duplicates exist, return {"duplicateGroups":[]}
+- Do not force duplicates — only flag truly similar ones
+- Each note ID should appear in at most one duplicate group`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.content?.find(b => b.type === 'text')?.text || '';
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('No JSON in AI response');
+    res.json(JSON.parse(match[0]));
+  } catch (err) {
+    console.error('Duplicate detection error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── AI GROUPING ──
 app.post('/api/ai/group', requireFacilitator, async (req, res) => {
   const { context } = req.body;
   const notes = db.prepare('SELECT * FROM notes ORDER BY created_at ASC').all();
