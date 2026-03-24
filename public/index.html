@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BrainBoard — Collaborative Brainstorm</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
   --bg: #f5f0e8;
@@ -14,13 +14,6 @@
   --ink: #1a1410;
   --ink-muted: #6b5a45;
   --note-yellow: #fef08a;
-  --note-pink: #fda4af;
-  --note-blue: #93c5fd;
-  --note-green: #86efac;
-  --note-orange: #fdba74;
-  --note-purple: #c4b5fd;
-  --note-teal: #5eead4;
-  --note-red: #fca5a5;
   --accent: #d97706;
   --panel: #fffdf7;
   --shadow: rgba(26,20,16,0.18);
@@ -31,7 +24,7 @@
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;}
 
 .header{background:var(--ink);color:#fef3c7;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px var(--shadow);}
-.header h1{font-family:'Permanent Marker',cursive;font-size:1.45rem;letter-spacing:1px;}
+.header h1{font-family:'Kalam',cursive;font-size:1.5rem;font-weight:700;letter-spacing:1px;}
 .header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .tabs{display:flex;gap:3px;background:rgba(255,255,255,0.08);border-radius:6px;padding:3px;}
 .tab-btn{font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;padding:5px 14px;border:none;border-radius:4px;cursor:pointer;background:transparent;color:#fef3c7;transition:all 0.2s;}
@@ -45,8 +38,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .participant-wrap{max-width:560px;margin:48px auto;padding:0 20px;}
 .note-card{background:var(--note-yellow);border-radius:2px;padding:28px 28px 22px;box-shadow:4px 4px 0 var(--cork),6px 6px 14px var(--shadow);position:relative;}
 .note-card::before{content:'';width:22px;height:22px;background:radial-gradient(circle at 35% 35%,#ccc,#666);border-radius:50%;position:absolute;top:-11px;left:50%;transform:translateX(-50%);box-shadow:0 2px 6px rgba(0,0,0,0.35);}
-.note-card label{font-family:'Permanent Marker',cursive;font-size:1rem;color:var(--ink-muted);display:block;margin-bottom:12px;}
-.note-card textarea{width:100%;min-height:110px;font-family:'Permanent Marker',cursive;font-size:1rem;background:transparent;border:none;border-bottom:2px dashed rgba(0,0,0,0.15);outline:none;resize:vertical;color:var(--ink);line-height:1.75;padding-bottom:8px;}
+.note-card label{font-family:'Kalam',cursive;font-size:1rem;font-weight:400;color:var(--ink-muted);display:block;margin-bottom:12px;}
+.note-card textarea{width:100%;min-height:110px;font-family:'Kalam',cursive;font-size:1.05rem;font-weight:400;background:transparent;border:none;border-bottom:2px dashed rgba(0,0,0,0.15);outline:none;resize:vertical;color:var(--ink);line-height:1.75;padding-bottom:8px;}
 .note-meta{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
 .note-meta input{font-family:'DM Sans',sans-serif;font-size:0.85rem;background:rgba(0,0,0,0.07);border:none;border-radius:4px;padding:7px 10px;color:var(--ink);outline:none;width:175px;}
 .note-meta input::placeholder{color:var(--ink-muted);}
@@ -62,11 +55,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .btn-ghost:hover{background:rgba(0,0,0,0.05);}
 .btn-warn{background:#f97316;color:#fff;}
 .btn-warn:hover{background:#ea6c0a;transform:translateY(-1px);}
+.btn-warn:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+.btn-green{background:#16a34a;color:#fff;}
+.btn-green:hover{background:#15803d;transform:translateY(-1px);}
 .btn-sm{padding:5px 11px;font-size:0.75rem;}
 
 .status-msg{text-align:center;margin-top:16px;font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--ink-muted);}
 .submitted-pile{margin-top:30px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;}
-.mini-note{width:84px;height:84px;border-radius:2px;box-shadow:2px 2px 0 var(--cork),3px 3px 8px var(--shadow);display:flex;align-items:center;justify-content:center;font-family:'Permanent Marker',cursive;font-size:0.62rem;text-align:center;padding:8px;transform:rotate(var(--rot));}
+.mini-note{width:84px;height:84px;border-radius:2px;background:var(--note-yellow);box-shadow:2px 2px 0 var(--cork),3px 3px 8px var(--shadow);display:flex;align-items:center;justify-content:center;font-family:'Kalam',cursive;font-size:0.72rem;font-weight:400;text-align:center;padding:8px;transform:rotate(var(--rot));}
 
 /* ── FACILITATOR ── */
 .fac-wrap{padding:20px 24px;}
@@ -85,10 +81,10 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 
 /* ── NOTES WALL ── */
 .notes-wall{display:flex;flex-wrap:wrap;gap:14px;padding:10px 0 20px;}
-.wall-note{width:130px;min-height:120px;border-radius:2px;padding:12px 10px 8px;box-shadow:3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);position:relative;transform:rotate(var(--rot));transition:transform 0.2s,box-shadow 0.2s;}
+.wall-note{width:130px;min-height:120px;border-radius:2px;background:var(--note-yellow);padding:12px 10px 8px;box-shadow:3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);position:relative;transform:rotate(var(--rot));transition:transform 0.2s,box-shadow 0.2s;}
 .wall-note:hover{transform:rotate(0deg) scale(1.05);box-shadow:4px 4px 0 var(--cork-dark),6px 6px 16px var(--shadow);z-index:5;}
 .wall-note.is-dup{box-shadow:0 0 0 3px var(--dup-highlight),3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);}
-.wall-note .ntext{font-family:'Permanent Marker',cursive;font-size:0.76rem;line-height:1.55;word-break:break-word;}
+.wall-note .ntext{font-family:'Kalam',cursive;font-size:0.85rem;font-weight:400;line-height:1.55;word-break:break-word;color:var(--ink);}
 .wall-note .nauthor{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--ink-muted);margin-top:8px;text-align:right;}
 .wall-note .ndel{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;border:none;background:rgba(0,0,0,0.12);color:var(--ink);font-size:0.68rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;}
 .wall-note:hover .ndel{opacity:1;}
@@ -101,9 +97,14 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .dup-group:last-child{margin-bottom:0;}
 .dup-reason{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--ink-muted);margin-bottom:10px;font-style:italic;}
 .dup-notes{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
-.dup-note-preview{background:var(--note-yellow);border-radius:2px;padding:8px 10px;font-family:'Permanent Marker',cursive;font-size:0.72rem;max-width:200px;box-shadow:2px 2px 0 var(--cork-dark);line-height:1.4;}
-.dup-note-preview .dup-note-author{font-family:'Space Mono',monospace;font-size:0.55rem;color:var(--ink-muted);margin-top:4px;}
-.dup-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.dup-note-preview{background:var(--note-yellow);border-radius:2px;padding:8px 10px;font-family:'Kalam',cursive;font-size:0.82rem;font-weight:400;max-width:200px;box-shadow:2px 2px 0 var(--cork-dark);line-height:1.4;}
+.dup-note-author{font-family:'Space Mono',monospace;font-size:0.55rem;color:var(--ink-muted);margin-top:4px;}
+.dup-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+.merge-editor{margin-top:12px;background:var(--note-yellow);border-radius:4px;padding:12px 14px;border:2px dashed var(--cork);}
+.merge-editor label{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--ink-muted);display:block;margin-bottom:6px;}
+.merge-editor textarea{width:100%;font-family:'Kalam',cursive;font-size:0.95rem;font-weight:400;background:transparent;border:none;border-bottom:2px dashed rgba(0,0,0,0.15);outline:none;resize:vertical;color:var(--ink);line-height:1.6;min-height:50px;padding-bottom:4px;}
+.merge-editor-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
 
 /* ── AI PANEL ── */
 .ai-panel{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:18px 20px;margin-bottom:20px;box-shadow:0 2px 8px var(--shadow);}
@@ -113,25 +114,32 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .ai-loading{font-family:'Space Mono',monospace;font-size:0.73rem;color:var(--accent);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
 
+/* ── CONTEXT MODAL (for re-run AI) ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,20,16,0.65);display:flex;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(3px);}
+.modal-card{background:var(--panel);border:1.5px solid var(--cork);border-radius:8px;padding:28px 30px;max-width:480px;width:90%;box-shadow:0 8px 32px var(--shadow);}
+.modal-card h3{font-family:'Space Mono',monospace;font-size:0.82rem;letter-spacing:1px;color:var(--ink-muted);margin-bottom:10px;}
+.modal-card textarea{width:100%;min-height:80px;resize:vertical;font-family:'DM Sans',sans-serif;font-size:0.87rem;border:1.5px solid var(--cork);border-radius:4px;padding:9px 12px;background:var(--bg);color:var(--ink);outline:none;}
+.modal-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+
 /* ── BOARD ── */
 .board-scroll{overflow-x:auto;padding-bottom:16px;}
 .board{display:flex;gap:16px;flex-wrap:nowrap;align-items:flex-start;padding:4px 2px;}
 .group-col{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:14px 14px 18px;min-width:195px;max-width:220px;flex:0 0 auto;box-shadow:0 2px 10px var(--shadow);transition:border-color 0.15s,background 0.15s;}
 .group-col.drag-over{border-color:var(--accent);background:#fffbf0;}
 .group-header{display:flex;align-items:center;gap:6px;margin-bottom:12px;}
-.group-name-input{font-family:'Permanent Marker',cursive;font-size:0.95rem;color:var(--ink);background:transparent;border:none;border-bottom:2px dashed var(--cork);outline:none;width:100%;padding:2px 4px;cursor:text;}
+.group-name-input{font-family:'Kalam',cursive;font-size:1rem;font-weight:700;color:var(--ink);background:transparent;border:none;border-bottom:2px dashed var(--cork);outline:none;width:100%;padding:2px 4px;cursor:text;}
 .group-del{background:none;border:none;cursor:pointer;color:#ef4444;font-size:0.85rem;flex-shrink:0;padding:2px;}
 .group-notes{display:flex;flex-direction:column;gap:8px;min-height:60px;}
-.board-note{border-radius:2px;padding:10px 9px 7px;box-shadow:2px 2px 0 var(--cork-dark),3px 3px 8px var(--shadow);cursor:grab;position:relative;transform:rotate(var(--rot));transition:transform 0.15s;}
+.board-note{border-radius:2px;background:var(--note-yellow);padding:10px 9px 7px;box-shadow:2px 2px 0 var(--cork-dark),3px 3px 8px var(--shadow);cursor:grab;position:relative;transform:rotate(var(--rot));transition:transform 0.15s;}
 .board-note:hover{transform:rotate(0deg) scale(1.03);z-index:5;}
 .board-note.dragging{opacity:0.35;}
-.bn-text{font-family:'Permanent Marker',cursive;font-size:0.73rem;line-height:1.55;word-break:break-word;outline:none;min-height:18px;}
+.bn-text{font-family:'Kalam',cursive;font-size:0.85rem;font-weight:400;line-height:1.55;word-break:break-word;outline:none;min-height:18px;color:var(--ink);}
 .bn-actions{display:flex;gap:4px;margin-top:6px;opacity:0;transition:opacity 0.15s;}
 .board-note:hover .bn-actions{opacity:1;}
 .bn-btn{font-size:0.6rem;padding:2px 7px;border-radius:3px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;}
 .bn-del{background:rgba(239,68,68,0.15);color:#ef4444;}
 
-.add-group-btn{background:transparent;border:2px dashed var(--cork);border-radius:7px;padding:16px 20px;cursor:pointer;font-family:'Permanent Marker',cursive;font-size:0.88rem;color:var(--ink-muted);min-width:160px;flex:0 0 auto;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.add-group-btn{background:transparent;border:2px dashed var(--cork);border-radius:7px;padding:16px 20px;cursor:pointer;font-family:'Kalam',cursive;font-size:0.95rem;font-weight:400;color:var(--ink-muted);min-width:160px;flex:0 0 auto;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
 .add-group-btn:hover{background:rgba(200,169,110,0.12);border-color:var(--cork-dark);}
 
 .export-panel{background:var(--panel);border:1.5px solid var(--cork);border-radius:7px;padding:16px 20px;margin-top:22px;box-shadow:0 2px 8px var(--shadow);}
@@ -140,20 +148,11 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 /* ── AUTH ── */
 .auth-overlay{position:fixed;inset:0;background:rgba(26,20,16,0.72);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);}
 .auth-card{background:var(--note-yellow);border-radius:2px;padding:36px 40px;box-shadow:6px 6px 0 var(--cork-dark),10px 10px 24px var(--shadow);max-width:360px;width:90%;}
-.auth-card h2{font-family:'Permanent Marker',cursive;font-size:1.4rem;margin-bottom:6px;}
+.auth-card h2{font-family:'Kalam',cursive;font-size:1.5rem;font-weight:700;margin-bottom:6px;}
 .auth-card p{font-size:0.82rem;color:var(--ink-muted);margin-bottom:18px;line-height:1.55;}
 .auth-card input{width:100%;padding:10px 14px;border:2px solid var(--cork);border-radius:4px;font-family:'Space Mono',monospace;font-size:0.9rem;background:var(--bg);outline:none;margin-bottom:12px;}
 .auth-error{color:#ef4444;font-size:0.75rem;margin-bottom:8px;font-family:'Space Mono',monospace;}
 .auth-row{display:flex;gap:8px;}
-
-.nc0{background:var(--note-yellow);}
-.nc1{background:var(--note-pink);}
-.nc2{background:var(--note-blue);}
-.nc3{background:var(--note-green);}
-.nc4{background:var(--note-orange);}
-.nc5{background:var(--note-purple);}
-.nc6{background:var(--note-teal);}
-.nc7{background:var(--note-red);}
 
 @media(max-width:600px){
   .header{padding:10px 14px;}
@@ -174,6 +173,18 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
     <div class="auth-row">
       <button class="btn btn-primary" onclick="checkAuth()" style="flex:1">Enter</button>
       <button class="btn btn-ghost" onclick="cancelAuth()" style="flex:1">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT MODAL (Re-run AI) -->
+<div class="modal-overlay" id="contextModal" style="display:none;">
+  <div class="modal-card">
+    <h3>✦ AI GROUPING — EDIT CONTEXT</h3>
+    <textarea id="modalContext" rows="4" placeholder="Describe the project so AI can name groups well. E.g. 'New point-of-care diagnostic launch. Teams: R&D, Finance, Supply Chain, Lab Ops, Regulatory Affairs.'"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-accent" onclick="confirmRunAI()">✦ Run grouping</button>
+      <button class="btn btn-ghost" onclick="closeContextModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -226,11 +237,10 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
         <button class="btn btn-ghost btn-sm" onclick="clearAll()">Clear all</button>
       </div>
 
-      <!-- Duplicate section (hidden until AI finds some) -->
       <div class="dup-section" id="dupSection" style="display:none;">
         <h3>⚠ POSSIBLE DUPLICATES — Review with your team</h3>
         <div id="dupGroups"></div>
-        <div style="margin-top:10px;">
+        <div style="margin-top:12px;">
           <button class="btn btn-ghost btn-sm" onclick="dismissAllDups()">Dismiss all</button>
         </div>
       </div>
@@ -239,13 +249,13 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 
       <div class="ai-panel">
         <h3>✦ AI TOOLS</h3>
-        <div class="ai-actions" style="margin-top:0;margin-bottom:12px;">
+        <div class="ai-actions" style="margin-top:0;margin-bottom:14px;">
           <button class="btn btn-warn btn-sm" id="dupBtn" onclick="findDuplicates()">⚑ Find duplicates</button>
           <span class="ai-loading" id="dupLoading" style="display:none;">Scanning…</span>
         </div>
         <textarea id="projectContext" placeholder="Optional: describe the project so AI can name groups well. E.g. 'New point-of-care diagnostic launch. Teams: R&D, Finance, Supply Chain, Lab Ops, Regulatory Affairs.'" rows="3"></textarea>
         <div class="ai-actions">
-          <button class="btn btn-accent" id="aiBtn" onclick="runAI()">✦ Suggest groupings with AI</button>
+          <button class="btn btn-accent" id="aiBtn" onclick="openContextModal()">✦ Suggest groupings with AI</button>
           <span class="ai-loading" id="aiLoading" style="display:none;">Thinking…</span>
         </div>
       </div>
@@ -257,7 +267,7 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
       <div class="toolbar">
         <h2>Drag notes · Edit group names · Add / remove</h2>
         <button class="btn btn-ghost btn-sm" onclick="backToRaw()">← Back to notes</button>
-        <button class="btn btn-accent btn-sm" onclick="runAI()">✦ Re-run AI</button>
+        <button class="btn btn-accent btn-sm" onclick="openContextModal()">✦ Re-run AI</button>
       </div>
       <div class="board-scroll">
         <div class="board" id="groupBoard"></div>
@@ -282,10 +292,12 @@ let allGroups = [];
 let revealed = false;
 let dragNoteId = null, dragSrcGroupId = null;
 let dupHighlightIds = new Set();
+let currentDupGroups = [];
 
-const COLORS = ['nc0','nc1','nc2','nc3','nc4','nc5','nc6','nc7'];
-const ROTS   = [-3,-2.5,-2,-1.5,-1,0,1,1.5,2,2.5,3];
+const ROTS = [-3,-2.5,-2,-1.5,-1,0,1,1.5,2,2.5,3];
 const rnd = a => a[Math.floor(Math.random()*a.length)];
+// Single color for all notes
+const NOTE_COLOR = 'nc0';
 let clientNextId = Date.now();
 const uid = () => String(clientNextId++);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -372,7 +384,7 @@ async function submitNote() {
   const text = document.getElementById('noteText').value.trim();
   if (!text) return;
   const author = document.getElementById('authorName').value.trim() || 'Anonymous';
-  const note = { id: uid(), text, author, color: rnd(COLORS), rot: rnd(ROTS) };
+  const note = { id: uid(), text, author, color: NOTE_COLOR, rot: rnd(ROTS) };
   document.getElementById('submitBtn').disabled = true;
   try {
     await apiFetch('/api/notes', { method: 'POST', body: JSON.stringify(note) });
@@ -393,7 +405,7 @@ function renderSubmittedPile() {
   const pile = document.getElementById('submittedPile');
   if (!revealed) { pile.innerHTML = ''; return; }
   pile.innerHTML = allNotes.map(n =>
-    `<div class="mini-note ${n.color}" style="--rot:${n.rot}deg">${esc(n.text.substring(0,40))}</div>`
+    `<div class="mini-note" style="--rot:${n.rot}deg">${esc(n.text.substring(0,40))}</div>`
   ).join('');
 }
 
@@ -402,7 +414,7 @@ function renderFacilitatorRaw() {
     allNotes.length + ' note' + (allNotes.length !== 1 ? 's' : '');
   document.getElementById('notesWall').innerHTML = allNotes.map(n => {
     const isDup = dupHighlightIds.has(n.id);
-    return `<div class="wall-note ${n.color}${isDup ? ' is-dup' : ''}" style="--rot:${n.rot}deg">
+    return `<div class="wall-note${isDup ? ' is-dup' : ''}" style="--rot:${n.rot}deg">
       ${isDup ? `<div class="dup-badge">possible duplicate</div>` : ''}
       <button class="ndel" onclick="deleteNote('${n.id}')">✕</button>
       <div class="ntext">${esc(n.text)}</div>
@@ -411,23 +423,39 @@ function renderFacilitatorRaw() {
   }).join('');
 }
 
+// ── CONTEXT MODAL ──
+function openContextModal() {
+  const current = document.getElementById('projectContext').value;
+  document.getElementById('modalContext').value = current;
+  document.getElementById('contextModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('modalContext').focus(), 80);
+}
+function closeContextModal() {
+  document.getElementById('contextModal').style.display = 'none';
+}
+async function confirmRunAI() {
+  const context = document.getElementById('modalContext').value.trim();
+  // Sync back to the main context field
+  document.getElementById('projectContext').value = context;
+  closeContextModal();
+  await runAI(context);
+}
+
 // ── DUPLICATE DETECTION ──
 async function findDuplicates() {
   if (allNotes.length < 2) { alert('Add at least 2 notes first.'); return; }
   const btn = document.getElementById('dupBtn');
   const loading = document.getElementById('dupLoading');
   btn.disabled = true; loading.style.display = 'inline';
-
   try {
     const result = await apiFetch('/api/ai/duplicates', { method: 'POST', body: JSON.stringify({}) });
     dupHighlightIds = new Set();
-
     if (!result.duplicateGroups || result.duplicateGroups.length === 0) {
       document.getElementById('dupSection').style.display = 'none';
       alert('No duplicates found — all notes look distinct.');
       return;
     }
-
+    currentDupGroups = result.duplicateGroups;
     result.duplicateGroups.forEach(g => g.ids.forEach(id => dupHighlightIds.add(id)));
     renderFacilitatorRaw();
     renderDupSection(result.duplicateGroups);
@@ -442,12 +470,11 @@ function renderDupSection(dupGroups) {
   const section = document.getElementById('dupSection');
   const container = document.getElementById('dupGroups');
   section.style.display = 'block';
-
   container.innerHTML = dupGroups.map((g, gi) => {
     const notePreviews = g.ids.map(id => {
       const n = allNotes.find(n => n.id === id);
       if (!n) return '';
-      return `<div class="dup-note-preview ${n.color}">
+      return `<div class="dup-note-preview">
         ${esc(n.text)}
         <div class="dup-note-author">${esc(n.author)}</div>
       </div>`;
@@ -456,37 +483,85 @@ function renderDupSection(dupGroups) {
     const deleteButtons = g.ids.map(id => {
       const n = allNotes.find(n => n.id === id);
       if (!n) return '';
-      return `<button class="btn btn-ghost btn-sm" onclick="deleteDupNote('${id}', ${gi})">
-        Delete "${esc(n.text.substring(0,20))}${n.text.length>20?'…':''}"
+      return `<button class="btn btn-ghost btn-sm" onclick="deleteDupNote('${id}',${gi})">
+        Delete "${esc(n.text.substring(0,25))}${n.text.length>25?'…':''}"
       </button>`;
     }).join('');
+
+    const mergedProposal = g.ids.map(id => {
+      const n = allNotes.find(n => n.id === id);
+      return n ? n.text : '';
+    }).filter(Boolean).join(' / ');
 
     return `<div class="dup-group" id="dupGroup${gi}">
       <div class="dup-reason">💬 ${esc(g.reason)}</div>
       <div class="dup-notes">${notePreviews}</div>
       <div class="dup-actions">
         ${deleteButtons}
+        <button class="btn btn-green btn-sm" onclick="showMergeEditor(${gi})">⇋ Merge into one</button>
         <button class="btn btn-ghost btn-sm" onclick="dismissDupGroup(${gi})">Keep all</button>
+      </div>
+      <div class="merge-editor" id="mergeEditor${gi}" style="display:none;">
+        <label>Edit merged note text — then confirm:</label>
+        <textarea id="mergeText${gi}" rows="2">${esc(mergedProposal)}</textarea>
+        <div class="merge-editor-actions">
+          <button class="btn btn-green btn-sm" onclick="confirmMerge(${gi})">✓ Confirm merge</button>
+          <button class="btn btn-ghost btn-sm" onclick="hideMergeEditor(${gi})">Cancel</button>
+        </div>
       </div>
     </div>`;
   }).join('');
 }
 
-async function deleteDupNote(id, groupIndex) {
+function showMergeEditor(gi) {
+  document.getElementById('mergeEditor' + gi).style.display = 'block';
+  document.getElementById('mergeText' + gi).focus();
+}
+function hideMergeEditor(gi) {
+  document.getElementById('mergeEditor' + gi).style.display = 'none';
+}
+
+async function confirmMerge(gi) {
+  const g = currentDupGroups[gi];
+  if (!g) return;
+  const mergedText = document.getElementById('mergeText' + gi).value.trim();
+  if (!mergedText) { alert('Merged note cannot be empty.'); return; }
+  const [keepId, ...deleteIds] = g.ids;
+  const keepNote = allNotes.find(n => n.id === keepId);
+  if (!keepNote) return;
+  try {
+    await apiFetch('/api/notes/' + keepId, { method: 'PATCH', body: JSON.stringify({ text: mergedText }) });
+    keepNote.text = mergedText;
+    for (const id of deleteIds) {
+      await apiFetch('/api/notes/' + id, { method: 'DELETE' });
+      allNotes = allNotes.filter(n => n.id !== id);
+      allGroups.forEach(grp => { grp.noteIds = grp.noteIds.filter(nid => nid !== id); });
+      dupHighlightIds.delete(id);
+    }
+    dupHighlightIds.delete(keepId);
+    currentDupGroups.splice(gi, 1);
+    document.getElementById('dupGroup' + gi).remove();
+    if (!document.getElementById('dupGroups').children.length) {
+      document.getElementById('dupSection').style.display = 'none';
+      dupHighlightIds.clear();
+    }
+    renderFacilitatorRaw();
+  } catch(err) {
+    alert('Merge failed: ' + err.message);
+  }
+}
+
+async function deleteDupNote(id, gi) {
   await deleteNote(id);
   dupHighlightIds.delete(id);
-  // Remove this note from the dup group display
-  const groupEl = document.getElementById('dupGroup' + groupIndex);
-  if (groupEl) {
-    const remaining = groupEl.querySelectorAll('.dup-note-preview').length - 1;
-    if (remaining < 2) {
-      groupEl.remove();
-      dupHighlightIds.forEach(did => {
-        // Check if dupSection is now empty
-      });
+  if (currentDupGroups[gi]) {
+    currentDupGroups[gi].ids = currentDupGroups[gi].ids.filter(did => did !== id);
+    if (currentDupGroups[gi].ids.length < 2) {
+      currentDupGroups.splice(gi, 1);
+      const groupEl = document.getElementById('dupGroup' + gi);
+      if (groupEl) groupEl.remove();
     }
   }
-  // Hide section if no more groups
   if (!document.getElementById('dupGroups').children.length) {
     document.getElementById('dupSection').style.display = 'none';
     dupHighlightIds.clear();
@@ -494,25 +569,24 @@ async function deleteDupNote(id, groupIndex) {
   renderFacilitatorRaw();
 }
 
-function dismissDupGroup(groupIndex) {
-  const groupEl = document.getElementById('dupGroup' + groupIndex);
-  if (groupEl) {
-    // Remove highlights for notes in this group
-    groupEl.querySelectorAll('.dup-note-preview').forEach(el => {
-      // We don't have the IDs here easily, so just clear all and re-render
-    });
-    groupEl.remove();
+function dismissDupGroup(gi) {
+  if (currentDupGroups[gi]) {
+    currentDupGroups[gi].ids.forEach(id => dupHighlightIds.delete(id));
+    currentDupGroups.splice(gi, 1);
   }
+  const groupEl = document.getElementById('dupGroup' + gi);
+  if (groupEl) groupEl.remove();
   if (!document.getElementById('dupGroups').children.length) {
     document.getElementById('dupSection').style.display = 'none';
     dupHighlightIds.clear();
-    renderFacilitatorRaw();
   }
+  renderFacilitatorRaw();
 }
 
 function dismissAllDups() {
   document.getElementById('dupSection').style.display = 'none';
   dupHighlightIds.clear();
+  currentDupGroups = [];
   renderFacilitatorRaw();
 }
 
@@ -529,24 +603,24 @@ async function clearAll() {
   await apiFetch('/api/notes', { method: 'DELETE' });
   allNotes = []; allGroups = [];
   dupHighlightIds.clear();
+  currentDupGroups = [];
   document.getElementById('dupSection').style.display = 'none';
   backToRaw();
   renderFacilitatorRaw();
 }
 
-async function runAI() {
+async function runAI(context) {
   if (allNotes.length < 2) { alert('Add at least 2 notes first.'); return; }
   const btn = document.getElementById('aiBtn');
   const loading = document.getElementById('aiLoading');
   btn.disabled = true; loading.style.display = 'inline';
-  const context = document.getElementById('projectContext').value.trim();
   try {
     const parsed = await apiFetch('/api/ai/group', { method: 'POST', body: JSON.stringify({ context }) });
     const usedIds = new Set();
     allGroups = parsed.groups.map((g, i) => ({
       id: uid(), name: g.name,
       noteIds: g.noteIds.filter(id => allNotes.find(n => n.id === id)),
-      color: COLORS[i % COLORS.length]
+      color: 'nc0'
     }));
     allGroups.forEach(g => g.noteIds.forEach(id => usedIds.add(id)));
     const ungrouped = allNotes.filter(n => !usedIds.has(n.id)).map(n => n.id);
@@ -595,7 +669,7 @@ function renderBoard() {
         ${g.noteIds.map(nid => {
           const n = getNoteById(nid);
           if (!n) return '';
-          return `<div class="board-note ${n.color}" style="--rot:${n.rot}deg"
+          return `<div class="board-note" style="--rot:${n.rot}deg"
                     draggable="true" data-note-id="${n.id}">
             <div class="bn-text" contenteditable="true"
               onblur="editNoteText('${n.id}',this.innerText)"
@@ -672,7 +746,7 @@ async function deleteGroup(id) {
   renderBoard();
 }
 async function addGroup() {
-  allGroups.push({ id: uid(), name: 'New Group', noteIds: [], color: rnd(COLORS) });
+  allGroups.push({ id: uid(), name: 'New Group', noteIds: [], color: 'nc0' });
   await saveGroups();
   renderBoard();
 }
