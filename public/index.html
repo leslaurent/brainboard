@@ -84,7 +84,8 @@ input:checked+.toggle-slider::before{transform:translateX(20px);}
 .wall-note{width:130px;min-height:120px;border-radius:2px;background:var(--note-yellow);padding:12px 10px 8px;box-shadow:3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);position:relative;transform:rotate(var(--rot));transition:transform 0.2s,box-shadow 0.2s;}
 .wall-note:hover{transform:rotate(0deg) scale(1.05);box-shadow:4px 4px 0 var(--cork-dark),6px 6px 16px var(--shadow);z-index:5;}
 .wall-note.is-dup{box-shadow:0 0 0 3px var(--dup-highlight),3px 3px 0 var(--cork-dark),5px 5px 10px var(--shadow);}
-.wall-note .ntext{font-family:'Kalam',cursive;font-size:0.85rem;font-weight:400;line-height:1.55;word-break:break-word;color:var(--ink);}
+.wall-note .ntext{font-family:'Kalam',cursive;font-size:0.85rem;font-weight:400;line-height:1.55;word-break:break-word;color:var(--ink);outline:none;cursor:text;}
+.wall-note .ntext:hover{border-bottom:1.5px dashed rgba(0,0,0,0.2);}
 .wall-note .nauthor{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--ink-muted);margin-top:8px;text-align:right;}
 .wall-note .ndel{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;border:none;background:rgba(0,0,0,0.12);color:var(--ink);font-size:0.68rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;}
 .wall-note:hover .ndel{opacity:1;}
@@ -417,7 +418,10 @@ function renderFacilitatorRaw() {
     return `<div class="wall-note${isDup ? ' is-dup' : ''}" style="--rot:${n.rot}deg">
       ${isDup ? `<div class="dup-badge">possible duplicate</div>` : ''}
       <button class="ndel" onclick="deleteNote('${n.id}')">✕</button>
-      <div class="ntext">${esc(n.text)}</div>
+      <div class="ntext" contenteditable="true"
+        onblur="editNoteText('${n.id}',this.innerText)"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        title="Click to edit">${esc(n.text)}</div>
       <div class="nauthor">${esc(n.author)}</div>
     </div>`;
   }).join('');
@@ -502,8 +506,8 @@ function renderDupSection(dupGroups) {
         <button class="btn btn-ghost btn-sm" onclick="dismissDupGroup(${gi})">Keep all</button>
       </div>
       <div class="merge-editor" id="mergeEditor${gi}" style="display:none;">
-        <label>Edit merged note text — then confirm:</label>
-        <textarea id="mergeText${gi}" rows="2">${esc(mergedProposal)}</textarea>
+        <label id="mergeLabel${gi}">Edit merged note text — then confirm:</label>
+        <textarea id="mergeText${gi}" rows="2" placeholder="AI is writing a merged version…"></textarea>
         <div class="merge-editor-actions">
           <button class="btn btn-green btn-sm" onclick="confirmMerge(${gi})">✓ Confirm merge</button>
           <button class="btn btn-ghost btn-sm" onclick="hideMergeEditor(${gi})">Cancel</button>
@@ -513,9 +517,35 @@ function renderDupSection(dupGroups) {
   }).join('');
 }
 
-function showMergeEditor(gi) {
-  document.getElementById('mergeEditor' + gi).style.display = 'block';
-  document.getElementById('mergeText' + gi).focus();
+async function showMergeEditor(gi) {
+  const g = currentDupGroups[gi];
+  if (!g) return;
+  const editor = document.getElementById('mergeEditor' + gi);
+  const textarea = document.getElementById('mergeText' + gi);
+  const label = document.getElementById('mergeLabel' + gi);
+  editor.style.display = 'block';
+  textarea.value = '';
+  textarea.disabled = true;
+  label.textContent = '✦ AI is writing a merged version…';
+
+  const texts = g.ids.map(id => {
+    const n = allNotes.find(n => n.id === id);
+    return n ? n.text : '';
+  }).filter(Boolean);
+
+  try {
+    const result = await apiFetch('/api/ai/merge', {
+      method: 'POST',
+      body: JSON.stringify({ texts })
+    });
+    textarea.value = result.merged;
+  } catch(err) {
+    textarea.value = texts.join(' / ');
+  } finally {
+    textarea.disabled = false;
+    label.textContent = 'Edit merged note text — then confirm:';
+    textarea.focus();
+  }
 }
 function hideMergeEditor(gi) {
   document.getElementById('mergeEditor' + gi).style.display = 'none';

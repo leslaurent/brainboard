@@ -165,6 +165,37 @@ app.patch('/api/settings', requireFacilitator, (req, res) => {
   res.json({ ok: true });
 });
 
+// ── AI MERGE ──
+app.post('/api/ai/merge', requireFacilitator, async (req, res) => {
+  const { texts } = req.body;
+  if (!Array.isArray(texts) || texts.length < 2) {
+    return res.status(400).json({ error: 'Need at least 2 texts to merge.' });
+  }
+  const prompt = `These tasks from a brainstorming session are duplicates or near-duplicates:\n${texts.map((t,i)=>`${i+1}. ${t}`).join('\n')}\n\nWrite a single clear task that captures the combined intent. Return only the task text, nothing else. Keep it concise (under 15 words).`;
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 100,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    const merged = data.content?.find(b => b.type === 'text')?.text?.trim() || texts.join(' / ');
+    res.json({ merged });
+  } catch (err) {
+    console.error('AI merge error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── AI DUPLICATE DETECTION ──
 app.post('/api/ai/duplicates', requireFacilitator, async (req, res) => {
   const notes = db.prepare('SELECT * FROM notes ORDER BY created_at ASC').all();
